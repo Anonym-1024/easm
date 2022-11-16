@@ -1,0 +1,9 @@
+main
+var
+const
+lbl
+int
+char
+null
+func
+later

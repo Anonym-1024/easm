@@ -1,5 +1,5 @@
 import XCTest
-@testable import EASB
+@testable import EASBCompiler
 
 final class EASBTests: XCTestCase {
     func testExample() throws {

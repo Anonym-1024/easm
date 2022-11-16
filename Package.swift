@@ -25,7 +25,8 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "EASBCompiler",
-            dependencies: []),
+            dependencies: [],
+            resources: [.process("Resources/Keywords.txt"), .process("Resources/Instructions.txt")]),
         .executableTarget(
             name: "EASBDriver",
             dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser"), .target(name: "EASBCompiler")]),
