@@ -7,21 +7,20 @@
 
 import Foundation
 
+public typealias LexerInput = String
+
 public class LexicalAnalyser{
     
     var chars: [Character]
     
     var pos: Int
     
-    
-    
     public init(sourceCode: SourceCode) {
         self.chars = Array(sourceCode)
         self.pos = 0
     }
-    @discardableResult
+    
     public func tokens() throws -> [Token] {
-        var date = Date()
         var tokens = [Token]()
         while pos < chars.count {
             let char = chars[pos]
@@ -59,7 +58,6 @@ public class LexicalAnalyser{
                 throw LexerError.invalidCharacter
             }
         }
-        print(date.distance(to: Date()))
         return tokens
     }
     

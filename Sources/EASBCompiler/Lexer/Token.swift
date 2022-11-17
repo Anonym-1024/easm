@@ -7,11 +7,13 @@
 
 import Foundation
 
+
+
 public struct Token: CustomStringConvertible{
     var kind: Kind
     var lexeme: String
     public var description: String{
-        "\(kind): \(lexeme)\n"
+        return "\(kind): \(lexeme)\n"
     }
     public enum Kind{
         case identifier
