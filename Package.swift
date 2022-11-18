@@ -27,7 +27,7 @@ let package = Package(
             name: "EASBCompiler",
             dependencies: [],
             exclude: ["Resources/ExampleCode-outdated.rtf", "Resources/CodeExample.txt", "Resources/SyntaxHighlightingExample.pdf"],
-            resources: [.process("Resources/Keywords.txt"), .process("Resources/Instructions.txt"), .process("Resources/Colors.xcassets")]),
+            resources: [.process("Resources/Keywords.txt"), .process("Resources/Instructions.txt"), .process("Resources/Colors.xcassets"), .process("Resources/Syntax.txt")]),
         .executableTarget(
             name: "EASBDriver",
             dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser"), .target(name: "EASBCompiler")]),

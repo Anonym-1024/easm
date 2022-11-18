@@ -12,7 +12,49 @@ import EASBCompiler
 @main
 struct EASBDriver{
     static func main() throws {
+        
+        
         print(try LexicalAnalyser(sourceCode: """
+global {
+    var a: int = later
+    var sum: int = later
+    var h: int = -986
+}
+
+func input() -> value: int{
+    var _value: int = later
+}
+
+
+main {
+---input---
+    call $input
+    loada $input.value
+    storea $a
+---input---
+    call $input
+    loada $input.value
+
+    loadb $a
+    addab $sum
+    outrn $sum
+}
+
+
+func input {
+    in
+    jmpi end; lbl loop = $$
+    jmp loop
+    storeir $value; lbl end = $$
+}
+
+""").tokens())
+        
+    }
+    
+}
+
+/*
 main {
     /*take input*/
     in
@@ -132,8 +174,4 @@ var five: int = fivet
 var two: int = twot
 var one: int = onet
 var input: int = later
-
-
-""").tokens())
-    }
-}
+*/

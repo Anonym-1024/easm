@@ -7,6 +7,6 @@
 
 import Foundation
 
-public class Parser{
+public class Parser {
     
 }

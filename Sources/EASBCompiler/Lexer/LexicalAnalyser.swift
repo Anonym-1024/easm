@@ -51,9 +51,18 @@ public class LexicalAnalyser{
                 tokens.append(try handleOperator())
                 
             //Punctuation
-            case "{", "}", "(", ")", ",", ".", ";", ":", "-":
+            case "{", "}", "(", ")", ",", ".", ";", ":":
                 tokens.append(handlePunctuation())
                 
+            case "-":
+                if chars[pos + 1] == ">" {
+                    tokens.append(handlePunctuation())
+                } else if ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].contains(chars[pos + 1]) {
+                    tokens.append(handleNumberLiteral())
+                } else {
+                    tokens.append(try handleOperator())
+                }
+                    
             default:
                 throw LexerError.invalidCharacter
             }
@@ -81,7 +90,7 @@ public class LexicalAnalyser{
     
     func handleCharLiteral() throws -> Token{
         if ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].contains(chars[pos + 1]) && chars[pos + 2] == "\"" {
-            let token = Token(kind: .literal, lexeme: String(["\"", chars[pos + 1], "\""]))
+            let token = Token(kind: .charLiteral, lexeme: String(["\"", chars[pos + 1], "\""]))
             pos += 3
             return token
         } else {
@@ -97,7 +106,7 @@ public class LexicalAnalyser{
             num.append(chars[pos])
             pos += 1
         }
-        return Token(kind: .literal, lexeme: num)
+        return Token(kind: .numberLiteral, lexeme: num)
     }
     
     func handleWord() -> Token {
@@ -121,6 +130,10 @@ public class LexicalAnalyser{
         if chars[pos] == "$" && chars[pos + 1] == "$" {
             let token = Token(kind: .operator, lexeme: "$$")
             pos += 2
+            return token
+        } else if chars[pos...(pos + 2)] == ["-", "-", "-"]{
+            let token = Token(kind: .operator, lexeme: "---")
+            pos += 3
             return token
         } else if chars[pos - 1] == " " && chars[pos + 1] == " " {
             let token = Token(kind: .operator, lexeme: String(chars[(pos - 1)...(pos + 1)]))

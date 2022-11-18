@@ -21,6 +21,7 @@ public struct Token: CustomStringConvertible{
         case instruction
         case `operator`
         case punctuation
-        case literal
+        case numberLiteral
+        case charLiteral
     }
 }
