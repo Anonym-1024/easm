@@ -16,9 +16,11 @@ struct EASBDriver{
         
         let t = try LexicalAnalyser(sourceCode: """
         main {
-            statementh
+            call &reta3
+            loada $div.return; lbl reta3 = $$
         }
         """).tokens()
+        print(t)
         let parser = Parser(tokens: t, as: .asb)
         print(try parser.parse().rootNode)
     }

@@ -8,11 +8,15 @@
 import Foundation
 import ArgumentParser
 
-public struct Node {
+public struct Node: CustomStringConvertible {
     init(children: [Node], kind: Kind, content: Token? = nil) {
         self.children = children
         self.kind = kind
         self.content = content
+    }
+    
+    public var description: String{
+        "\(children.isEmpty ? "\(content!)" : "\(kind) \(children)")\n"
     }
     
     public var children: [Node]

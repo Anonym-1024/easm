@@ -54,13 +54,13 @@ public class Parser {
         case .asb:
             return try CST(rootNode: parseFileAsb())
         case .ash:
-            return try CST(rootNode: parseFileAsh())
+            return try CST(rootNode: parseFileAsb())
         }
     }
     
     func parseFileAsb() throws -> Node {
         let mainNode = try parseMain()
-        if let funcImplementationsNode == try? parseFuncImplementations() {
+        if let funcImplementationsNode = try? parseFuncImplementations() {
             return Node(children: [mainNode, funcImplementationsNode], kind: .fileAsb)
         } else {
             return Node(children: [mainNode], kind: .fileAsb)
@@ -77,10 +77,12 @@ public class Parser {
         advance()
         
         let statementsNode = try parseStatements()
-        
+        print(pos)
         guard conforms(to: "}") else { throw ParserError.expectedPunctuation("}")}
         let rBraceNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        if pos < tokens.count - 1 {
+            advance()
+        }
         
         return Node(children: [mainKeywordNode, lBraceNode, statementsNode, rBraceNode], kind: .main)
     }
@@ -112,14 +114,20 @@ public class Parser {
         advance()
         
         if let instrArgNode = try? parseInstrArg() {
-            return Node(children: [identifierNode, instrArgNode], kind: .instructionStmt)
+            if conforms(to: ";") {
+                advance()
+            }
+            return Node(children: [instructionNode, instrArgNode], kind: .instructionStmt)
         } else {
-            return Node(children: [identifierNode], kind: .instructionStmt)
+            if conforms(to: ";") {
+                advance()
+            }
+            return Node(children: [instructionNode], kind: .instructionStmt)
         }
     }
     
     func parseInstrArg() throws -> Node {
-        if let addresstNode = try? parseAddress() {
+        if let addressNode = try? parseAddress() {
             return Node(children: [addressNode], kind: .instrArg)
         } else if let pointerNode = try? parsePointer() {
             return Node(children: [pointerNode], kind: .instrArg)
@@ -129,7 +137,7 @@ public class Parser {
     }
     
     func parseAddress() throws -> Node {
-        if conforms(to: "#") {
+        if conforms(to: " #") {
             let numberSignNode = Node(children: [], kind: .leaf, content: currentToken())
             advance()
             
@@ -138,12 +146,12 @@ public class Parser {
             advance()
             
             return Node(children: [numberSignNode, numberLiteralNode], kind: .address)
-        } else if conforms(to: "$") {
+        } else if conforms(to: " $") {
             let dollarSignNode = Node(children: [], kind: .leaf, content: currentToken())
             advance()
             
             let identifierNode = try parseIdentifier()
-            return Node(children: [numberSignNode, identifierNode], kind: .address)
+            return Node(children: [dollarSignNode, identifierNode], kind: .address)
         } else if conforms(to: "$$") {
             let dollarNode = Node(children: [], kind: .leaf, content: currentToken())
             advance()
@@ -154,22 +162,21 @@ public class Parser {
     }
     
     func parsePointer() throws -> Node {
-        if conforms(to: "&") {
+        
+        if conforms(to: " &") {
             let ampersandNode = Node(children: [], kind: .leaf, content: currentToken())
             advance()
             
-            guard conforms(to: .numberLiteral) else { throw ParserError.invalidPointer}
-            let numberLiteralNode = Node(children: [], kind: .leaf, content: currentToken())
-            advance()
-            
-            return Node(children: [ampersandNode, numberLiteralNode], kind: .pointer)
-        } else if conforms(to: "&") {
-            let ampersandNode = Node(children: [], kind: .leaf, content: currentToken())
-            advance()
-            
-            let identifierNode = try parseIdentifier()
-            
-            return Node(children: [ampersandNode, identifierNode], kind: .pointer)
+            if conforms(to: .numberLiteral) {
+                let numberLiteralNode = Node(children: [], kind: .leaf, content: currentToken())
+                advance()
+                
+                return Node(children: [ampersandNode, numberLiteralNode], kind: .pointer)
+            } else if let identifierNode = try? parseIdentifier() {
+                return Node(children: [ampersandNode, identifierNode], kind: .pointer)
+            } else {
+                throw ParserError.invalidPointer
+            }
         } else {
             throw ParserError.invalidPointer
         }
@@ -200,7 +207,7 @@ public class Parser {
         let identifierNode = Node(children: [], kind: .leaf, content: currentToken())
         advance()
         
-        guard conforms(to: "=") else { throw ParserError.invalidLabelDeclaration}
+        guard conforms(to: " = ") else { throw ParserError.invalidLabelDeclaration}
         let equalSignNode = Node(children: [], kind: .leaf, content: currentToken())
         advance()
         
@@ -228,7 +235,7 @@ public class Parser {
     func parseFuncImplementations() throws -> Node {
         let funcImplementationNode = try parseFuncImplementation()
         
-        if let funcImplementationsNode = try parseFuncImplementations() {
+        if let funcImplementationsNode = try? parseFuncImplementations() {
             return Node(children: [funcImplementationNode, funcImplementationsNode], kind: .funcImplementations)
         } else {
             return Node(children: [funcImplementationNode], kind: .funcImplementations)
@@ -259,7 +266,7 @@ public class Parser {
     
     
     //ASH files
-    func parseFileAsh() throws -> Node {
+    /*func parseFileAsh() throws -> Node {
         
     }
     
@@ -309,7 +316,7 @@ public class Parser {
     
     func parseFuncDeclBody() throws -> Node {
         
-    }
+    }*/
     
     
     enum ParserError: Error {
