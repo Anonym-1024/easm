@@ -1,6 +1,6 @@
 
 <file-asb> ->> <main> <func-implementations>?
-<main> ->> { <statements> }
+<main> ->> main { <statements> }
 <statements> ->> <statement> <statements>?
 <statement> ->> <instruction-stmt> | <lbl-declaration> | <namespace>
 <instruction-stmt> ->> .instruction <instr-arg>?

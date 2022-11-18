@@ -8,7 +8,7 @@
 import Foundation
 
 public class CST {
-    public init(rootNode: Node) {
+    init(rootNode: Node) {
         self.rootNode = rootNode
     }
     

@@ -14,42 +14,13 @@ struct EASBDriver{
     static func main() throws {
         
         
-        print(try LexicalAnalyser(sourceCode: """
-global {
-    var a: int = later
-    var sum: int = later
-    var h: int = -986
-}
-
-func input() -> value: int{
-    var _value: int = later
-}
-
-
-main {
----input---
-    call $input
-    loada $input.value
-    storea $a
----input---
-    call $input
-    loada $input.value
-
-    loadb $a
-    addab $sum
-    outrn $sum
-}
-
-
-func input {
-    in
-    jmpi end; lbl loop = $$
-    jmp loop
-    storeir $value; lbl end = $$
-}
-
-""").tokens())
-        
+        let t = try LexicalAnalyser(sourceCode: """
+        main {
+            statementh
+        }
+        """).tokens()
+        let parser = Parser(tokens: t, as: .asb)
+        print(try parser.parse().rootNode)
     }
     
 }

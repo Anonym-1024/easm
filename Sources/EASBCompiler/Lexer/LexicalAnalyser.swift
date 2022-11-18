@@ -150,8 +150,8 @@ public class LexicalAnalyser{
     
     func handlePunctuation() -> Token {
         var token: Token
-        if chars[pos + 1] == ">" {
-             token = Token(kind: .punctuation, lexeme: String(chars[pos...(pos + 1)]))
+        if chars[pos] == "-", chars[pos + 1] == ">" {
+             token = Token(kind: .punctuation, lexeme: "->")
             pos += 1
         } else {
             token = Token(kind: .punctuation, lexeme: String(chars[pos]))
