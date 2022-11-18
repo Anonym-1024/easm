@@ -16,8 +16,113 @@ struct EASBDriver{
         
         let t = try LexicalAnalyser(sourceCode: """
         main {
+            /*take input*/
+            in
+            jmpi ret; lbl _in = $$
+            jmp $in
+            storeir $input; lbl _ret = $$
+
+            /*call div*/
+            call &ret51; lbl loop = $$
+            push $input
+            push $five
+            jmp $div
+            /*output result*/
+            outrn $div.return; lbl ret51 = $$
+            /*call mod*/
+            call &ret52
+            push $input
+            push $five
+            jmp $mod
+            /*assign result of mod to input*/
+            loada $mod.return; lbl ret52  = $$
+            storea $input
+            /*call div*/
+            call &ret21
+            push $input
+            push $two
+            jmp $div
+            /*output result*/
+            outrn $div.return; lbl ret21  = $$
+            /*call mod*/
+            call &ret22
+            push $input
+            push $two
+            jmp $mod
+            /*assign result of mod to input*/
+            loada $mod.return; lbl ret22 = $$
+            storea $input
+            /*call div*/
+            call &ret11
+            push $input
+            push $one
+            jmp $div
+            /*output result*/
+            outrn $div.return; lbl ret11 = $$
+            /*call mod*/
+            call &ret12
+            push $input
+            push $one
+            jmp $mod
+            /*assign result of mod to input*/
+            loada $mod.return; lbl ret12 = $$
+            storea $input
+
+
+
+
+            /*call div*/
+            call &reta1
+            push $input
+            push $ten
+            jmp $div
+            loada $div.return; lbl reta1 = $$
+            storea $one
+
+            /*call div*/
+            call &reta2
+            push $input
+            push $ten
+            jmp $div
+            loada $div.return; lbl reta2 = $$
+            storea $two
+
+            /*call div*/
             call &reta3
+            push $input
+            push $ten
+            jmp $div
             loada $div.return; lbl reta3 = $$
+            storea $five
+
+            loada $null
+            loadb $one
+            jmpe $loop
+            halt
+        }
+
+
+        func div{
+        loada $a
+        loadb $b
+        subab $r; lbl _sub = $$
+        loada $r
+        jmps $_end
+        jmp $_sub
+        ret; lbl _end = $$
+        }
+
+
+        func mod {
+                    loada $a
+                    loadb $b
+                    subab $r; lbl _sub = $$
+                    loada $r
+                    jmps $_end
+                    jmp $_sub
+                    ret; lbl _end = $$
+
+
         }
         """).tokens()
         print(t)

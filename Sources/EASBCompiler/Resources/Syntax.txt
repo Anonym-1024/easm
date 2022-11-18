@@ -5,8 +5,8 @@
 <statement> ->> <instruction-stmt> | <lbl-declaration> | <namespace>
 <instruction-stmt> ->> .instruction <instr-arg>?
 <instr-arg> ->> <address> | <pointer>
-<address> ->>  # .numberLiteral |  $ <identifier> | $$
-<pointer> ->>  & .numberLiteral |  & <identifier>
+<address> ->>  # .numberLiteral |  $ <identifier> | $$ | $ null
+<pointer> ->>  & .numberLiteral |  & <identifier> | & null
 <identifier> ->> .identifier | .identifier . <identifier>
 <lbl-declaration> ->> lbl .identifier = <address>
 <namespace> ->> --- .identifier ---

@@ -31,7 +31,9 @@ public class Parser {
     
     func popToken() -> Token {
         let token = tokens[pos]
-        pos += 1
+        if pos < tokens.count - 1{
+            pos += 1
+        }
         return token
     }
     
@@ -68,22 +70,23 @@ public class Parser {
     }
     
     func parseMain() throws -> Node {
+        let date = Date()
         guard conforms(to: "main") else { throw ParserError.expectedKeyword("main")}
-        let mainKeywordNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let mainKeywordNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         guard conforms(to: "{") else { throw ParserError.expectedPunctuation("{")}
-        let lBraceNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let lBraceNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         let statementsNode = try parseStatements()
         print(pos)
         guard conforms(to: "}") else { throw ParserError.expectedPunctuation("}")}
-        let rBraceNode = Node(children: [], kind: .leaf, content: currentToken())
+        let rBraceNode = Node(children: [], kind: .leaf, content: popToken())
         if pos < tokens.count - 1 {
-            advance()
+            
         }
-        
+        print(date.distance(to: Date()))
         return Node(children: [mainKeywordNode, lBraceNode, statementsNode, rBraceNode], kind: .main)
     }
     
@@ -110,8 +113,8 @@ public class Parser {
     
     func parseInstructionStmt() throws -> Node {
         guard conforms(to: .instruction) else { throw ParserError.expectedInstruction}
-        let instructionNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let instructionNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         if let instrArgNode = try? parseInstrArg() {
             if conforms(to: ";") {
@@ -138,23 +141,31 @@ public class Parser {
     
     func parseAddress() throws -> Node {
         if conforms(to: " #") {
-            let numberSignNode = Node(children: [], kind: .leaf, content: currentToken())
-            advance()
+            let numberSignNode = Node(children: [], kind: .leaf, content: popToken())
+            
             
             guard conforms(to: .numberLiteral) else { throw ParserError.invalidAddress}
-            let numberLiteralNode = Node(children: [], kind: .leaf, content: currentToken())
-            advance()
+            let numberLiteralNode = Node(children: [], kind: .leaf, content: popToken())
+            
             
             return Node(children: [numberSignNode, numberLiteralNode], kind: .address)
         } else if conforms(to: " $") {
-            let dollarSignNode = Node(children: [], kind: .leaf, content: currentToken())
-            advance()
+            let dollarSignNode = Node(children: [], kind: .leaf, content: popToken())
             
-            let identifierNode = try parseIdentifier()
-            return Node(children: [dollarSignNode, identifierNode], kind: .address)
+            
+            if let identifierNode = try? parseIdentifier() {
+                return Node(children: [dollarSignNode, identifierNode], kind: .address)
+            } else if conforms(to: "null") {
+                let nullNode = Node(children: [], kind: .leaf, content: popToken())
+                
+                
+                return Node(children: [dollarSignNode, nullNode], kind: .address)
+            } else {
+                throw ParserError.invalidAddress
+            }
         } else if conforms(to: "$$") {
-            let dollarNode = Node(children: [], kind: .leaf, content: currentToken())
-            advance()
+            let dollarNode = Node(children: [], kind: .leaf, content: popToken())
+            
             return Node(children: [dollarNode], kind: .address)
         } else {
             throw ParserError.invalidAddress
@@ -164,16 +175,21 @@ public class Parser {
     func parsePointer() throws -> Node {
         
         if conforms(to: " &") {
-            let ampersandNode = Node(children: [], kind: .leaf, content: currentToken())
-            advance()
+            let ampersandNode = Node(children: [], kind: .leaf, content: popToken())
+            
             
             if conforms(to: .numberLiteral) {
-                let numberLiteralNode = Node(children: [], kind: .leaf, content: currentToken())
-                advance()
+                let numberLiteralNode = Node(children: [], kind: .leaf, content: popToken())
+                
                 
                 return Node(children: [ampersandNode, numberLiteralNode], kind: .pointer)
             } else if let identifierNode = try? parseIdentifier() {
                 return Node(children: [ampersandNode, identifierNode], kind: .pointer)
+            } else if conforms(to: "null") {
+                let nullNode = Node(children: [], kind: .leaf, content: popToken())
+                
+                
+                return Node(children: [ampersandNode, nullNode], kind: .pointer)
             } else {
                 throw ParserError.invalidPointer
             }
@@ -184,12 +200,12 @@ public class Parser {
     
     func parseIdentifier() throws -> Node {
         guard conforms(to: .identifier) else { throw ParserError.expectedIdentifier}
-        let identifierNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let identifierNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         if conforms(to: ".") {
-            let dotNode = Node(children: [], kind: .leaf, content: currentToken())
-            advance()
+            let dotNode = Node(children: [], kind: .leaf, content: popToken())
+            
             
             let nextIdentifierNode = try parseIdentifier()
             return Node(children: [identifierNode, dotNode, nextIdentifierNode], kind: .identifier)
@@ -200,16 +216,16 @@ public class Parser {
     
     func parseLblDeclaration() throws -> Node {
         guard conforms(to: "lbl") else { throw ParserError.invalidLabelDeclaration}
-        let lblNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let lblNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         guard conforms(to: .identifier) else { throw ParserError.invalidLabelDeclaration}
-        let identifierNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let identifierNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         guard conforms(to: " = ") else { throw ParserError.invalidLabelDeclaration}
-        let equalSignNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let equalSignNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         let addressNode = try parseAddress()
         
@@ -218,16 +234,16 @@ public class Parser {
     
     func parseNamespace() throws -> Node {
         guard conforms(to: "---") else { throw ParserError.invalidNamespaceDeclaration}
-        let startNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let startNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         guard conforms(to: .identifier) else { throw ParserError.invalidNamespaceDeclaration}
-        let identifierNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let identifierNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         guard conforms(to: "---") else { throw ParserError.invalidNamespaceDeclaration}
-        let endNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let endNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         return Node(children: [startNode, identifierNode, endNode], kind: .namespace)
     }
@@ -244,22 +260,22 @@ public class Parser {
     
     func parseFuncImplementation() throws -> Node {
         guard conforms(to: "func") else { throw ParserError.invalidFunctionImplementation}
-        let funcNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let funcNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         guard conforms(to: .identifier) else { throw ParserError.invalidFunctionImplementation}
-        let identifierNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let identifierNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         guard conforms(to: "{") else { throw ParserError.invalidFunctionImplementation}
-        let lBraceNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let lBraceNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         let statementsNode = try parseStatements()
         
         guard conforms(to: "}") else { throw ParserError.invalidFunctionImplementation}
-        let rBraceNode = Node(children: [], kind: .leaf, content: currentToken())
-        advance()
+        let rBraceNode = Node(children: [], kind: .leaf, content: popToken())
+        
         
         return Node(children: [funcNode, identifierNode, lBraceNode, statementsNode, rBraceNode], kind: .funcImplementation)
     }
