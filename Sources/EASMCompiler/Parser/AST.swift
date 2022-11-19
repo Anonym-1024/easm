@@ -13,7 +13,7 @@ public struct AST {
         
     }
     
-    public var rootNode: Node
+    public var rootNode: Node?
     
     public struct Node: CustomStringConvertible {
         init(children: [Node], kind: Kind, content: Token? = nil) {

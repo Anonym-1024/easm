@@ -28,7 +28,7 @@ public class Parser {
     
     //Helper methods
     func currentToken() -> Token {
-        tokens[pos]
+        return tokens[pos]
     }
     
     func popToken() -> Token {
@@ -36,7 +36,22 @@ public class Parser {
         if pos < tokens.count - 1{
             pos += 1
         }
+        while pos < tokens.count - 1 && tokens[pos].lexeme == "\n" {
+            pos += 1
+        }
         return token
+    }
+    
+    func wasTerminatedByNewLine() -> Bool {
+        tokens[previousTokenPos() + 1].lexeme == "\n"
+    }
+    
+    func previousTokenPos() -> Int {
+        var _pos = pos - 1
+        while tokens[_pos].lexeme == "\n" {
+            _pos -= 1
+        }
+        return _pos
     }
     
     func advance(_ by: Int = 1) {
@@ -75,7 +90,6 @@ public class Parser {
     }
     
     func parseMain() throws -> Node {
-        let date = Date()
         guard conforms(to: "main") else { throw ParserError.expectedKeyword("main")}
         let mainKeywordNode = Node(children: [], kind: .leaf, content: popToken())
         
@@ -85,22 +99,23 @@ public class Parser {
         
         
         let statementsNode = try parseStatements()
-        print(pos)
         guard conforms(to: "}") else { throw ParserError.expectedPunctuation("}")}
         let rBraceNode = Node(children: [], kind: .leaf, content: popToken())
         if pos < tokens.count - 1 {
             
         }
-        print(date.distance(to: Date()))
         return Node(children: [mainKeywordNode, lBraceNode, statementsNode, rBraceNode], kind: .main)
     }
     
     func parseStatements() throws -> Node {
         let statementNode = try parseStatement()
+        
+        let terminatorNode = try parseTerminator()
+        
         if let statementsNode = try? parseStatements() {
-            return Node(children: [statementNode, statementsNode], kind: .statements)
+            return Node(children: [statementNode, terminatorNode, statementsNode], kind: .statements)
         } else {
-            return Node(children: [statementNode], kind: .statements)
+            return Node(children: [statementNode, terminatorNode], kind: .statements)
         }
     }
     
@@ -116,20 +131,26 @@ public class Parser {
         }
     }
     
+    func parseTerminator() throws -> Node {
+        if conforms(to: ";") {
+            return Node(children: [], kind: .leaf, content: popToken())
+        } else if wasTerminatedByNewLine() {
+            return Node(children: [], kind: .leaf, content: Token(kind: .punctuation, lexeme: "\n"))
+        } else if conforms(to: "}") {
+            return Node(children: [], kind: .leaf, content: currentToken())
+        } else {
+            throw ParserError.invalidStatement
+        }
+    }
+    
     func parseInstructionStmt() throws -> Node {
         guard conforms(to: .instruction) else { throw ParserError.expectedInstruction}
         let instructionNode = Node(children: [], kind: .leaf, content: popToken())
         
         
         if let instrArgNode = try? parseInstrArg() {
-            if conforms(to: ";") {
-                advance()
-            }
             return Node(children: [instructionNode, instrArgNode], kind: .instructionStmt)
         } else {
-            if conforms(to: ";") {
-                advance()
-            }
             return Node(children: [instructionNode], kind: .instructionStmt)
         }
     }
@@ -276,13 +297,21 @@ public class Parser {
         let lBraceNode = Node(children: [], kind: .leaf, content: popToken())
         
         
-        let statementsNode = try parseStatements()
+        if let statementsNode = try? parseStatements() {
+            guard conforms(to: "}") else { throw ParserError.invalidFunctionImplementation}
+            let rBraceNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            
+            return Node(children: [funcNode, identifierNode, lBraceNode, statementsNode, rBraceNode], kind: .funcImplementation)
+        } else {
+            guard conforms(to: "}") else { throw ParserError.invalidFunctionImplementation}
+            let rBraceNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            
+            return Node(children: [funcNode, identifierNode, lBraceNode, rBraceNode], kind: .funcImplementation)
+        }
         
-        guard conforms(to: "}") else { throw ParserError.invalidFunctionImplementation}
-        let rBraceNode = Node(children: [], kind: .leaf, content: popToken())
         
-        
-        return Node(children: [funcNode, identifierNode, lBraceNode, statementsNode, rBraceNode], kind: .funcImplementation)
     }
     
     

@@ -27,7 +27,7 @@ public class LexicalAnalyser{
             switch char {
                 
             //Whitespaces
-            case " ", "\n":
+            case " ":
                 pos += 1
                 
             //Comments
@@ -51,7 +51,7 @@ public class LexicalAnalyser{
                 tokens.append(try handleOperator())
                 
             //Punctuation
-            case "{", "}", "(", ")", ",", ".", ";", ":":
+            case "{", "}", "(", ")", ",", ".", ";", ":", "\n":
                 tokens.append(handlePunctuation())
                 
             //Minus sign
@@ -144,7 +144,7 @@ public class LexicalAnalyser{
             let token = Token(kind: .operator, lexeme: String(chars[(pos - 1)...(pos + 1)]))
             pos += 2
             return token
-        } else if chars[pos - 1] == " " && ["_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"].contains(chars[pos + 1]) {
+        } else if chars[pos - 1] == " " && ["_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "`"].contains(chars[pos + 1]) {
             let token = Token(kind: .operator, lexeme: String(chars[(pos - 1)...pos]))
             pos += 1
             return token

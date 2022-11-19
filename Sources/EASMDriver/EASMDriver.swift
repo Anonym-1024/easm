@@ -19,10 +19,12 @@ struct EASMDriver: ParsableCommand {
         print("Welcome to easm compiler.\n\nUse build command to build your source code.\n")
         let t = try! LexicalAnalyser(sourceCode: """
 main {
-        in
-        jmpi ret; lbl `in` = $$
-        jmp $in
-        storeir $input; lbl `ret` = $$
+    call
+    ret $h.j.k
+}
+
+func a{
+    
 }
 """).tokens()
         print(t)

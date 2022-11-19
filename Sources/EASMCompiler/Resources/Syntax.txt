@@ -1,8 +1,9 @@
 
 <file-asm> ->> <main> <func-implementations>?
 <main> ->> main { <statements> }
-<statements> ->> <statement> <statements>?
+<statements> ->> <statement> <stmt-terminator> <statements>?
 <statement> ->> <instruction-stmt> | <lbl-declaration> | <namespace>
+<stmt-terminator> ->> ; | \n | }
 <instruction-stmt> ->> .instruction <instr-arg>?
 <instr-arg> ->> <address> | <pointer>
 <address> ->>  # .numberLiteral |  $ <identifier> | $$ | $ null
