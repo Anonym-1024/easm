@@ -54,6 +54,7 @@ public class LexicalAnalyser{
             case "{", "}", "(", ")", ",", ".", ";", ":":
                 tokens.append(handlePunctuation())
                 
+            //Minus sign
             case "-":
                 if chars[pos + 1] == ">" {
                     tokens.append(handlePunctuation())
@@ -62,6 +63,10 @@ public class LexicalAnalyser{
                 } else {
                     tokens.append(try handleOperator())
                 }
+                
+            //Backtick
+            case "`":
+                tokens.append(try handleBacktick())
                     
             default:
                 throw LexerError.invalidCharacter
@@ -89,8 +94,8 @@ public class LexicalAnalyser{
     }
     
     func handleCharLiteral() throws -> Token{
-        if ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].contains(chars[pos + 1]) && chars[pos + 2] == "\"" {
-            let token = Token(kind: .charLiteral, lexeme: String(["\"", chars[pos + 1], "\""]))
+        if [" ", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].contains(chars[pos + 1]) && chars[pos + 2] == "\"" {
+            let token = Token(kind: .charLiteral, lexeme: String(chars[pos + 1]))
             pos += 3
             return token
         } else {
@@ -161,9 +166,26 @@ public class LexicalAnalyser{
         return token
     }
     
+    func handleBacktick() throws -> Token {
+        pos += 1
+        var word = String()
+        
+        while ["_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].contains(chars[pos]) {
+            word.append(chars[pos])
+            pos += 1
+        }
+        if chars[pos] == "`" {
+            pos += 1
+            return Token(kind: .identifier, lexeme: word)
+        } else {
+            throw LexerError.expectedBacktick
+        }
+    }
+    
     enum LexerError: Error{
         case invalidCharacter
         case invalidOperator
         case invalidCharacterLiteral
+        case expectedBacktick
     }
 }

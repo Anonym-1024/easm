@@ -8,14 +8,37 @@
 import Foundation
 import ArgumentParser
 import EASBCompiler
+import SwiftUI
 
 @main
-struct EASBDriver: ParsableCommand{
+struct EASBDriver: ParsableCommand {
+    static var configuration: CommandConfiguration{
+        .init(subcommands: [EASBBuild.self], defaultSubcommand: nil)
+    }
+    func run() throws {
+        print("Welcome to easb compiler.\n\nUse build command to build your source code.\n")
+        let t = try! LexicalAnalyser(sourceCode: """
+main {
+        in
+        jmpi ret; lbl `in` = $$
+        jmp $in
+        storeir $input; lbl `ret` = $$
+}
+""").tokens()
+        print(t)
+        print(try! Parser(tokens: t, as: .asb).parse())
+    }
+    
+}
+
+struct EASBBuild: ParsableCommand {
+    static var configuration: CommandConfiguration{
+        .init(commandName: "build")
+    }
     @Argument(parsing: .captureForPassthrough) var urls: [String]
     func run() throws {
         print(urls)
     }
-    
 }
 
 /*
