@@ -50,13 +50,16 @@ public class Parser {
     }
     
     
+    
+    
+    
     //ASB files
     public func parse() throws -> CST {
         switch fileType {
         case .asb:
             return try CST(rootNode: parseFileAsb())
         case .ash:
-            return try CST(rootNode: parseFileAsb())
+            return try CST(rootNode: parseFileAsh())
         }
     }
     
@@ -281,58 +284,201 @@ public class Parser {
     }
     
     
+    
+
+    
+    
+    
     //ASH files
-    /*func parseFileAsh() throws -> Node {
+    func parseFileAsh() throws -> Node {
+        var children = [Node]()
         
+        if let globalDeclNode = try? parseGlobalDecl() {
+            children.append(globalDeclNode)
+        }
+        if let funcDeclarationsNode = try? parseFuncDeclarations() {
+            children.append(funcDeclarationsNode)
+        }
+        
+        return Node(children: children, kind: .fileAsh)
     }
     
     func parseGlobalDecl() throws -> Node {
+        guard conforms(to: "global") else { throw ParserError.expectedKeyword("global") }
+        let globalNode = Node(children: [], kind: .leaf, content: popToken())
         
+        guard conforms(to: "{") else { throw ParserError.expectedKeyword("global") }
+        let lBracketNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        let varDeclarationsNode = try parseVarDeclarations()
+        
+        guard conforms(to: "}") else { throw ParserError.expectedKeyword("global") }
+        let rBracketNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        return Node(children: [globalNode, lBracketNode, varDeclarationsNode, rBracketNode], kind: .globalDecl)
     }
     
     func parseVarDeclarations() throws -> Node {
-        
+        let varDeclarationNode = try parseVarDeclaration()
+        if let varDeclarationsNode = try? parseVarDeclarations() {
+            return Node(children: [varDeclarationNode, varDeclarationsNode], kind: .varDeclarations)
+        } else {
+            return Node(children: [varDeclarationNode], kind: .varDeclarations)
+        }
     }
     
     func parseVarDeclaration() throws -> Node {
-        
+        if conforms(to: "var") {
+            let varNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            guard conforms(to: .identifier) else { throw ParserError.expectedIdentifier }
+            let identifierNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            guard conforms(to: ":") else { throw ParserError.expectedTypeDeclaration }
+            let colonNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            let typeNode = try parseType()
+            
+            guard conforms(to: " = ") else { throw ParserError.expectedPunctuation("=") }
+            let equalSignNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            let varValueNode = try parseVarValue()
+            
+            return Node(children: [varNode, identifierNode, colonNode, typeNode, equalSignNode, varValueNode], kind: .varDeclaration)
+            
+        } else if conforms(to: "const") {
+            let constNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            guard conforms(to: .identifier) else { throw ParserError.expectedIdentifier }
+            let identifierNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            guard conforms(to: ":") else { throw ParserError.expectedTypeDeclaration }
+            let colonNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            let typeNode = try parseType()
+            
+            guard conforms(to: " = ") else { throw ParserError.expectedPunctuation("=") }
+            let equalSignNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            let literalNode = try parseLiteral()
+            
+            return Node(children: [constNode, identifierNode, colonNode, typeNode, equalSignNode, literalNode], kind: .varDeclaration)
+        } else {
+            throw ParserError.expectedKeyword("var/const")
+        }
     }
     
     func parseType() throws -> Node {
-        
+        if conforms(to: "int") || conforms(to: "char") {
+            return Node(children: [], kind: .leaf, content: popToken())
+        } else {
+            throw ParserError.invalidType
+        }
     }
     
     func parseVarValue() throws -> Node {
-        
+        if conforms(to: "later") || conforms(to: .identifier) {
+            return Node(children: [], kind: .leaf, content: popToken())
+        } else {
+            throw ParserError.invalidType
+        }
     }
     
     func parseLiteral() throws -> Node {
-        
+        if conforms(to: .charLiteral) || conforms(to: .numberLiteral) {
+            return Node(children: [], kind: .leaf, content: popToken())
+        } else {
+            throw ParserError.invalidType
+        }
     }
     
     func parseFuncDeclarations() throws -> Node {
-        
+        let funcDeclarationNode = try parseFuncDeclaration()
+        if let funcDeclarationsNode = try? parseFuncDeclarations() {
+            return Node(children: [funcDeclarationNode, funcDeclarationsNode], kind: .funcDeclarations)
+        } else {
+            return Node(children: [funcDeclarationNode], kind: .funcDeclarations)
+        }
     }
     
     func parseFuncDeclaration() throws -> Node {
+        guard conforms(to: "func") else { throw ParserError.expectedKeyword("func")}
+        let funcNode = Node(children: [], kind: .leaf, content: popToken())
         
+        guard conforms(to: .identifier) else { throw ParserError.expectedIdentifier }
+        let identifierNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        guard conforms(to: "(") else { throw ParserError.expectedPunctuation("(") }
+        let lParNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        let funcArgsNode = try parseFuncArgs()
+        
+        guard conforms(to: ")") else { throw ParserError.expectedPunctuation(")") }
+        let rParNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        var optNodes = [Node]()
+        if let funcRetNode = try? parseFuncRet() {
+            optNodes.append(funcRetNode)
+        }
+        if let funcDeclBody = try? parseFuncDeclBody() {
+            optNodes.append(funcDeclBody)
+        }
+        
+        return Node(children: [funcNode, identifierNode, lParNode, funcArgsNode, rParNode] + optNodes, kind: .funcDeclaration)
     }
     
     func parseFuncArgs() throws -> Node {
+        let funcArgNode = try parseFuncArg()
         
+        if conforms(to: ",") {
+            let commaNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            let funcArgsNode = try parseFuncArgs()
+            
+            return Node(children: [funcArgNode, commaNode, funcArgsNode], kind: .funcArgs)
+        } else {
+            return Node(children: [funcArgNode], kind: .funcArgs)
+        }
     }
     
     func parseFuncArg() throws -> Node {
+        guard conforms(to: .identifier) else { throw ParserError.expectedIdentifier}
+        let identifierNode = Node(children: [], kind: .leaf, content: popToken())
         
+        guard conforms(to: ":") else { throw ParserError.expectedPunctuation(":")}
+        let colonNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        let typeNode = try parseType()
+        
+        return Node(children: [identifierNode, colonNode, typeNode], kind: .funcArg)
     }
     
     func parseFuncRet() throws -> Node {
+        guard conforms(to: "->") else { throw ParserError.expectedIdentifier}
+        let arrowNode = Node(children: [], kind: .leaf, content: popToken())
         
+        guard conforms(to: .identifier) else { throw ParserError.expectedIdentifier}
+        let identifierNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        guard conforms(to: ":") else { throw ParserError.expectedPunctuation(":")}
+        let colonNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        let typeNode = try parseType()
+        
+        return Node(children: [arrowNode, identifierNode, colonNode, typeNode], kind: .funcRet)
     }
     
     func parseFuncDeclBody() throws -> Node {
+        guard conforms(to: "{") else { throw ParserError.expectedPunctuation("{")}
+        let lBracketNode = Node(children: [], kind: .leaf, content: popToken())
         
-    }*/
+        let varDeclarationsNode = try parseVarDeclarations()
+        
+        guard conforms(to: "}") else { throw ParserError.expectedPunctuation("}")}
+        let rBracketNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        return Node(children: [lBracketNode, varDeclarationsNode, rBracketNode], kind: .funcDeclBody)
+    }
     
     
     enum ParserError: Error {
@@ -347,5 +493,8 @@ public class Parser {
         case invalidLabelDeclaration
         case invalidNamespaceDeclaration
         case invalidFunctionImplementation
+        case expectedTypeDeclaration
+        case invalidType
     }
+    
 }
