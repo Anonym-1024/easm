@@ -19,7 +19,7 @@ public class Preprocessor{
         var sources = [SourceCode]()
         var headers = [HeaderCode]()
         for url in urls{
-            if url.isFileURL && (url.pathExtension == "asb") {
+            if url.isFileURL && (url.pathExtension == "asm") {
                 let content = try String(contentsOf: url)
                 sources.append(content)
             } else if url.isFileURL && (url.pathExtension == "ash") {

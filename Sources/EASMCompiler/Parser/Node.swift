@@ -8,7 +8,7 @@
 import Foundation
 import ArgumentParser
 
-public struct Node: CustomStringConvertible {
+/*public struct Node: CustomStringConvertible {
     init(children: [Node], kind: Kind, content: Token? = nil) {
         self.children = children
         self.kind = kind
@@ -24,7 +24,7 @@ public struct Node: CustomStringConvertible {
     public var content: Token?
     
     public enum Kind {
-        case fileAsb
+        case fileAsm
         case main
         case statements
         case statement
@@ -55,3 +55,4 @@ public struct Node: CustomStringConvertible {
         case leaf
     }
 }
+*/

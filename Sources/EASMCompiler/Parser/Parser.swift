@@ -9,8 +9,10 @@ import Foundation
 
 public class Parser {
     
+    typealias Node = CST.Node
+    
     public enum FileType {
-        case asb
+        case asm
         case ash
     }
     
@@ -53,22 +55,22 @@ public class Parser {
     
     
     
-    //ASB files
+    //ASM files
     public func parse() throws -> CST {
         switch fileType {
-        case .asb:
-            return try CST(rootNode: parseFileAsb())
+        case .asm:
+            return try CST(rootNode: parseFileAsm())
         case .ash:
             return try CST(rootNode: parseFileAsh())
         }
     }
     
-    func parseFileAsb() throws -> Node {
+    func parseFileAsm() throws -> Node {
         let mainNode = try parseMain()
         if let funcImplementationsNode = try? parseFuncImplementations() {
-            return Node(children: [mainNode, funcImplementationsNode], kind: .fileAsb)
+            return Node(children: [mainNode, funcImplementationsNode], kind: .fileAsm)
         } else {
-            return Node(children: [mainNode], kind: .fileAsb)
+            return Node(children: [mainNode], kind: .fileAsm)
         }
     }
     

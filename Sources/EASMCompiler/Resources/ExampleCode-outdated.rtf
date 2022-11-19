@@ -1,0 +1,145 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2580
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 SFMono-Regular;\f1\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red190\green22\blue135;\red255\green255\blue255;\red163\green163\blue163;
+\red138\green224\blue255;\red48\green198\blue4;\red14\green108\blue135;\red254\green227\blue10;\red249\green250\blue250;
+\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c80026\c20169\c60010;\cssrgb\c100000\c100000\c100000;\cssrgb\c69796\c69808\c69795;
+\cssrgb\c60085\c90107\c100000;\cssrgb\c20266\c79984\c0;\cssrgb\c314\c49692\c60169;\cssrgb\c99951\c90074\c0;\cssrgb\c98018\c98439\c98424;
+\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs20 \cf2 main\cf3  \{\
+\pard\tx566\pardeftab720\partightenfactor0
+\cf3 	\cf4 //take input\
+	\cf3 \'96\'96\'96\cf5 input\cf3 \'96\'96\'96\
+	\cf6 in						\cf3 \
+	\cf6 jmpi \cf7 _ret\cf3 ; \cf2 lbl\cf3  _\cf5 in\cf3  = \cf7 $$\cf6  \
+	jmp \cf7 _in\
+	\cf6 storeir \cf7 $input\cf3 ; \cf2 lbl\cf3  _\cf5 ret\cf3  =\cf7  $$\
+	\cf3 \'96\'96\'96\cf5 input\cf3 \'96\'96\'96\
+\
+	\cf4 //call div\
+\cf3 	\cf6 call\cf3  \cf8 &ret51\cf3 ; \cf2 lbl \cf5 loop\cf3   = \cf7 $$\cf3 \
+	\cf6 push\cf3  \cf7 $input\cf3 \
+	\cf6 push\cf3  \cf7 $five\
+	\cf6 jmp\cf3  \cf7 $div\
+	\cf4 //output result\
+\cf3 	\cf6 outrn\cf3  \cf7 div\cf3 .\cf7 $return\cf3 ; \cf2 lbl \cf5 ret51\cf3   = \cf7 $$\cf3  \
+\cf4 	//call mod\
+\cf3 	\cf6 call\cf3  \cf8 &ret52\cf3 \
+	\cf6 push\cf3  \cf7 $input\cf3 \
+	\cf6 push\cf3  \cf7 $five\
+	\cf6 jmp\cf3  \cf7 $mod\
+	\cf4 //assign result of mod to input\
+\cf3 	\cf6 loada\cf3  \cf7 mod\cf3 .\cf7 $return\cf3 ; \cf2 lbl \cf5 ret52\cf3   = \cf7 $$\cf3 \
+	\cf6 storea\cf3  \cf7 $input\
+\
+	\cf4 //call div\
+	\cf6 call\cf3  \cf8 &ret21\cf3 \
+	\cf6 push\cf3  \cf7 $input\cf3 \
+	\cf6 push\cf3  \cf7 $two\
+	\cf6 jmp\cf3  \cf7 $div\
+	\cf4 //output result\
+\cf3 	\cf6 outrn\cf3  \cf7 div\cf3 .\cf7 $return\cf3 ; \cf2 lbl \cf5 ret21\cf3   = \cf7 $$\cf3  \
+\cf4 	//call mod\
+\cf3 	\cf6 call\cf3  \cf8 &ret22\cf3 \
+	\cf6 push\cf3  \cf7 $input\cf3 \
+	\cf6 push\cf3  \cf7 $two\
+	\cf6 jmp\cf3  \cf7 $mod\
+	\cf4 //assign result of mod to input\
+\cf3 	\cf6 loada\cf3  \cf7 mod\cf3 .\cf7 $return\cf3 ; \cf2 lbl \cf5 ret22\cf3   = \cf7 $$\cf3 \
+	\cf6 storea\cf3  \cf7 $input\
+\cf3 \
+\cf4 	//call div\
+\cf3 	\cf6 call\cf3  \cf8 &ret11\cf3 \
+	\cf6 push\cf3  \cf7 $input\cf3 \
+	\cf6 push\cf3  \cf7 $one\
+	\cf6 jmp\cf3  \cf7 $div\
+	\cf4 //output result\
+\cf3 	\cf6 outrn\cf3  \cf7 div\cf3 .\cf7 $return\cf3 ; \cf2 lbl \cf5 ret11\cf3   = \cf7 $$\cf3  \
+\cf4 	//call mod\
+\cf3 	\cf6 call\cf3  \cf8 &ret12\cf3 \
+	\cf6 push\cf3  \cf7 $input\cf3 \
+	\cf6 push\cf3  \cf7 $one\
+	\cf6 jmp\cf3  \cf7 $mod\
+	\cf4 //assign result of mod to input\
+\cf3 	\cf6 loada\cf3  \cf7 mod\cf3 .\cf7 $return\cf3 ; \cf2 lbl \cf5 ret12\cf3   = \cf7 $$\cf3 \
+	\cf6 storea\cf3  \cf7 $input\
+\
+	\
+	\cf4 //call div\
+\cf3 	\cf6 call\cf3  \cf8 &reta1\cf3 \
+	\cf6 push\cf3  \cf7 $input\cf3 \
+	\cf6 push\cf3  \cf7 $ten\
+	\cf6 jmp\cf3  \cf7 $div\
+	\cf6 loada\cf3  \cf7 div\cf3 .\cf7 $return\cf3 ; \cf2 lbl \cf5 reta1\cf3   = \cf7 $$\cf3 \
+	\cf6 storea\cf3  \cf7 $one\cf3 \
+\cf7 \
+	\cf4 //call div\
+\cf3 	\cf6 call\cf3  \cf8 &reta2\cf3 \
+	\cf6 push\cf3  \cf7 $input\cf3 \
+	\cf6 push\cf3  \cf7 $ten\
+	\cf6 jmp\cf3  \cf7 $div\
+	\cf6 loada \cf7 div\cf3 .\cf7 $return\cf3 ; \cf2 lbl \cf5 reta2\cf3   = \cf7 $$\cf3 \
+	\cf6 storea\cf3  \cf7 $two\cf3 \
+\cf7 \
+	\cf4 //call div\
+\cf3 	\cf6 call\cf3  \cf8 &reta3\cf3 \
+	\cf6 push\cf3  \cf7 $input\cf3 \
+	\cf6 push\cf3  \cf7 $ten\
+	\cf6 jmp\cf3  \cf7 $div\
+	\cf6 loada\cf3  \cf7 div\cf9 .\cf7 $return\cf3 ; \cf2 lbl \cf5 reta3\cf3   = \cf7 $$\cf3 \
+	\cf6 storea\cf3  \cf7 $five\
+\
+	\cf4 //compare results of div\
+\cf7 	\cf6 loada\cf3  \cf2 null\cf3 \
+	\cf6 loadb\cf3  \cf7 $one\
+	\cf6 jmpe\cf5  \cf7 loop\
+	\cf6 halt\cf3 \
+\pard\pardeftab720\partightenfactor0
+\cf3 \}\
+\pard\pardeftab720\partightenfactor0
+\cf10 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 func\cf10  \cf5 div\cf3  \{\
+\pard\tx566\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf10 	
+\f0\fs20 \cf6 loada\cf3  \cf7 $a
+\f1\fs22 \cf10 	\
+	
+\f0\fs20 \cf6 loadb\cf10  \cf7 $b\cf3 ;\cf10  \cf2 lbl\cf10  \cf5 _sub\cf3  =\cf10  \cf7 $$
+\fs22 \cf10 \
+\pard\tx566\pardeftab720\partightenfactor0
+
+\fs20 \cf3 	\cf6 subab\cf3  \cf7 $r\
+	\cf6 loada\cf3  \cf7 $r\
+	\cf6 loadb\cf3  \cf2 null\cf3 \
+	\cf6 jmps\cf3  \cf7 $_end\
+\cf3 \
+	\cf6 loada\cf3  \cf7 $one\cf3 \
+	\cf6 loadb\cf3  \cf7 $count\
+\cf3 	\cf6 addab\cf3  \cf7 $count\
+	\cf6 loada\cf3  \cf7 $r\cf3 \
+	\cf6 jmp\cf3  \cf7 $_sub\
+\
+	\cf6 loada\cf3  \cf7 $count\cf3 ; \cf2 lbl \cf5 reta1\cf3   = \cf7 $$\cf3 \
+	\cf6 storea\cf3  \cf7 $return\cf3 \
+	\cf6 ret\cf3 ; \cf2 lbl\cf3  \cf5 _end\cf3  = \cf7 $$\cf3 \
+\pard\pardeftab720\partightenfactor0
+\cf3 \}\
+\pard\pardeftab720\partightenfactor0
+\cf10 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 func\cf10  \cf5 mod\cf2  \cf3 \{\
+\
+\
+\
+\
+\
+\}\
+}

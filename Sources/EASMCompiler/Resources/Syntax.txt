@@ -1,5 +1,5 @@
 
-<file-asb> ->> <main> <func-implementations>?
+<file-asm> ->> <main> <func-implementations>?
 <main> ->> main { <statements> }
 <statements> ->> <statement> <statements>?
 <statement> ->> <instruction-stmt> | <lbl-declaration> | <namespace>
