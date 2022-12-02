@@ -2,7 +2,7 @@
 //  File.swift
 //  
 //
-//  Created by Vašík Koukola on 23.11.2022.
+//  
 //
 
 import Foundation
