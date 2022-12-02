@@ -53,5 +53,15 @@ import Foundation
         
         case leaf
     }
+    
+   mutating func reducePunctuation() {
+        children.removeAll { i in
+            i.content?.kind == .punctuation && i.content?.lexeme != "."
+        }
+        
+        for i in 0..<children.count {
+            children[i].reducePunctuation()
+        }
+    }
 }
 */

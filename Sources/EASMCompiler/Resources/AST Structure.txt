@@ -1,0 +1,15 @@
+<file-asm> ->> <main>? [<func-implementation>]
+<main> ->> [<instruction> | <label> | <namespace>]
+<instruction> ->> `instruction` `argument`?
+<label> ->> `identifier` <address>
+<namespace> ->> `identifier`
+<address> ->> `operator` `content`?
+<pointer> ->>  `operator` `content`
+<func-implementation> ->> `name` [<instruction> | <label> | <namespace>]
+
+
+<file-ash> ->> <global>? [<func-declaration>]
+<global> ->> [<variable>]?
+<variable> ->> `const/var` `name` `type` `value`
+<func-declaration> ->> `name` [<arg>] <arg>? [<variable>]
+<arg> ->> `name` `type`

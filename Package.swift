@@ -27,7 +27,7 @@ let package = Package(
             name: "EASMCompiler",
             dependencies: [],
             exclude: ["Resources/ExampleCode-outdated.rtf", "Resources/CodeExample.txt", "Resources/SyntaxHighlightingExample.pdf"],
-            resources: [.process("Resources/Keywords.txt"), .process("Resources/Instructions.txt"), .process("Resources/Colors.xcassets"), .process("Resources/Syntax.txt")]),
+            resources: [.process("Resources/Keywords.txt"), .process("Resources/Instructions.txt"), .process("Resources/Colors.xcassets"), .process("Resources/Syntax.txt"), .process("Resources/AST Structure.txt")]),
         .executableTarget(
             name: "EASMDriver",
             dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser"), .target(name: "EASMCompiler")]),

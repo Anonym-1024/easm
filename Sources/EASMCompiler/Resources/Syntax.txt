@@ -1,6 +1,6 @@
 
 <file-asm> ->> <main> <func-implementations>?
-<main> ->> main { <statements> }
+<main> ->> main { <statements>? }
 <statements> ->> <statement> <stmt-terminator> <statements>?
 <statement> ->> <instruction-stmt> | <lbl-declaration> | <namespace>
 <stmt-terminator> ->> ; | \n | }
@@ -16,7 +16,7 @@
 
 
 <file-ash> ->> <global-decl>? <func-declarations>?
-<global-decl> ->> global { <var-declarations> }
+<global-decl> ->> global { <var-declarations>? }
 <var-declarations> ->> <var-declaration> <var-declarations>?
 <var-declaration> ->> var .identifier : <type> = <var-value> | const .identifier : <type> = <literal>
 <type> ->> int | char

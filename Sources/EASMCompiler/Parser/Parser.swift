@@ -81,12 +81,17 @@ public class Parser {
     }
     
     func parseFileAsm() throws -> Node {
-        let mainNode = try parseMain()
-        if let funcImplementationsNode = try? parseFuncImplementations() {
-            return Node(children: [mainNode, funcImplementationsNode], kind: .fileAsm)
-        } else {
-            return Node(children: [mainNode], kind: .fileAsm)
+        
+        var children = [Node]()
+        
+        if let mainNode = try? parseMain() {
+            children.append(mainNode)
         }
+        if let funcImplementationsNode = try? parseFuncImplementations() {
+            children.append(funcImplementationsNode)
+        }
+        
+        return Node(children: children, kind: .fileAsh)
     }
     
     func parseMain() throws -> Node {

@@ -14,6 +14,16 @@ public struct CST {
     
     public var rootNode: Node
     
+    public mutating func reducePunctuation() {
+        rootNode.children.removeAll { i in
+            i.content?.kind == .punctuation && i.content?.lexeme != "."
+        }
+         
+        for i in 0..<rootNode.children.count {
+            rootNode.children[i].reducePunctuation()
+        }
+    }
+    
     public struct Node: CustomStringConvertible {
         init(children: [Node], kind: Kind, content: Token? = nil) {
             self.children = children
@@ -22,7 +32,7 @@ public struct CST {
         }
         
         public var description: String{
-            "\(children.isEmpty ? "\(content!)" : "\(kind) \(children)")\n"
+            "\(children.isEmpty ? "\(content)" : "\(kind) \(children)")\n"
         }
         
         public var children: [Node]
@@ -60,6 +70,18 @@ public struct CST {
             
             case leaf
         }
+        
+       mutating func reducePunctuation() {
+            children.removeAll { i in
+                i.content?.kind == .punctuation && i.content?.lexeme != "."
+            }
+            
+            for i in 0..<children.count {
+                children[i].reducePunctuation()
+            }
+        }
     }
+
+
 
 }
