@@ -19,7 +19,7 @@ public class ASTBuilder {
         self.fileType = fileType
     }
     
-    // Helper methods
+    
     
     
     
@@ -29,10 +29,13 @@ public class ASTBuilder {
             let node = try fileAsm(self.cst.rootNode)
             return AST(rootNode: node)
         case .ash:
-            fatalError()
+            let node = try fileAsh(self.cst.rootNode)
+            return AST(rootNode: node)
         }
     }
  
+    // ASM File
+    
     func fileAsm(_ _from: CNode) throws -> ANode {
         var from = _from
         var array = [ANode]()
@@ -200,13 +203,162 @@ public class ASTBuilder {
         for child in from.children {
             if child.kind == .funcImplementation {
                 array.append(try funcImplementation(child))
-            } else if child.kind == .statements {
+            } else if child.kind == .funcImplementations {
                 array.append(contentsOf: try funcImplementations(child))
             }
         }
         return array
     }
 
+    
+    
+    
+    
+    // ASH File
+    
+    func fileAsh(_ _from: CNode) throws -> ANode {
+        var from = _from
+        var array = [ANode]()
+        if from.children.first?.kind == .globalDecl {
+            array.append(try global(from.children.first!))
+            from.children.removeFirst()
+        }
+        
+        
+        guard let funcDeclarations = try? funcDeclarations(from.children[0]) else { throw ASTError.error }
+        array.append(contentsOf: funcDeclarations)
+        
+        return ANode(children: array, kind: .ashFile)
+    }
+    
+    func global(_ _from: CNode) -> ANode {
+        
+        var from = _from
+        var array = [ANode]()
+        from.children.removeFirst()
+        
+        try array.append(contentsOf: variables(from.children[0]))
+        return ANode(children: array, kind: .global)
+    }
+    
+    func variable(_ _from: CNode) -> ANode {
+        var from = _from
+        var array = [ANode]()
+        var content = [String]()
+        
+        content.append(from.children[0].content!.lexeme)
+        
+        content.append(from.children[1].content!.lexeme)
+        
+        content.append(from.children[2].content!.lexeme)
+        
+        if from.children[4].content?.kind == .keyword {
+            content.append("later")
+        } else {
+            switch from.children[4].content!.kind {
+            case .identifier:
+                array.append(varValue(from.children[4]))
+            case .charLiteral:
+                array.append(charLiteral(from.children[4]))
+            case .numberLiteral:
+                array.append(intLiteral(from.children[4]))
+            default:
+                fatalError()
+            }
+
+        }
+        
+        return ANode(children: array, kind: .variable, content: content)
+    }
+    
+    func varValue(_ _from: CNode) -> ANode {
+        var from = _from
+        return ANode(children: [], kind: .varValue, content: [from.content!.lexeme])
+    }
+    
+    func charLiteral(_ _from: CNode) -> ANode {
+        var from = _from
+        
+        return ANode(children: [], kind: .charLiteral, content: [from.content!.lexeme])
+    }
+    
+    func intLiteral(_ _from: CNode) -> ANode {
+        var from = _from
+        
+        return ANode(children: [], kind: .intLiteral, content: [from.content!.lexeme])
+    }
+    
+    func variables(_ _from: CNode) -> [ANode] {
+        let from = _from
+        var array = [ANode]()
+        for child in from.children {
+            if child.kind == .varDeclaration {
+                array.append(try variable(child))
+            } else if child.kind == .varDeclarations {
+                array.append(contentsOf: try variables(child))
+            }
+        }
+        return array
+    }
+    
+    func funcDeclaration(_ _from: CNode) -> ANode {
+        var from = _from
+        var array = [ANode]()
+        var content = [String]()
+        
+        from.children.removeFirst()
+        
+        content.append(from.children[0].content!.lexeme)
+        
+        array.append(contentsOf: args(from.children[1]))
+        print(from.children.last)
+        if from.children[2].kind == .funcRet {
+            array.append(ret(from.children[2]))
+        }
+        
+        if from.children.last!.kind == .funcDeclBody {
+            array.append(contentsOf: variables(from.children.last!))
+        }
+        
+        return ANode(children: array, kind: .funcDeclaration, content: content)
+    }
+    
+    func funcDeclarations(_ _from: CNode) -> [ANode] {
+        let from = _from
+        var array = [ANode]()
+        for child in from.children {
+            if child.kind == .funcDeclaration {
+                array.append(try funcDeclaration(child))
+            } else if child.kind == .funcDeclarations {
+                array.append(contentsOf: try funcDeclarations(child))
+            }
+        }
+        return array
+    }
+    
+    func arg(_ _from: CNode) -> ANode {
+        var from = _from
+        return ANode(children: [], kind: .arg, content: [from.children[0].content!.lexeme, from.children[1].content!.lexeme])
+    }
+    
+    func ret(_ _from: CNode) -> ANode {
+        var from = _from
+        return ANode(children: [], kind: .ret, content: [from.children[0].content!.lexeme, from.children[1].content!.lexeme])
+    }
+    
+    func args(_ _from: CNode) -> [ANode] {
+        let from = _from
+        var array = [ANode]()
+        for child in from.children {
+            if child.kind == .funcArg {
+                array.append(try arg(child))
+            } else if child.kind == .funcArgs {
+                array.append(contentsOf: try args(child))
+            }
+        }
+        return array
+    }
+    
     
     enum ASTError: Error {
         case error

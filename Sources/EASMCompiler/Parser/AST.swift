@@ -42,7 +42,11 @@ public struct AST {
             case global
             case variable
             case arg
+            case ret
             case funcDeclaration
+            case charLiteral
+            case intLiteral
+            case varValue
         }
     }
 

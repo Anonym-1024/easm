@@ -453,9 +453,12 @@ public class Parser {
         let rParNode = Node(children: [], kind: .leaf, content: popToken())
         
         var optNodes = [Node]()
+        
         if let funcRetNode = try? parseFuncRet() {
+            print("j")
             optNodes.append(funcRetNode)
         }
+        
         if let funcDeclBody = try? parseFuncDeclBody() {
             optNodes.append(funcDeclBody)
         }

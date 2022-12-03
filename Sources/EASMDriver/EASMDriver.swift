@@ -18,18 +18,18 @@ struct EASMDriver: ParsableCommand {
     func run() throws {
         print("Welcome to easm compiler.\n\nUse build command to build your source code.\n")
         let t = try! LexicalAnalyser(sourceCode: """
-main {
-    addab #78
+global {
+    const d : int = 8
 }
 
-func h {
-    jmpe $ff
+func myFunction(a: int, j: char) -> return: int {
+
 }
 """).tokens()
-        var f = try! Parser(tokens: t, as: .asm).parse()
+        var f = try! Parser(tokens: t, as: .ash).parse()
         f.reducePunctuation()
-        let ast = ASTBuilder(for: f, .asm)
-        print(try! ast.build().rootNode.children.first!)
+        let ast = ASTBuilder(for: f, .ash)
+        print(try! ast.build().rootNode.children.last!)
     }
     
 }
