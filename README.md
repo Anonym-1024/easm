@@ -2,7 +2,7 @@
 
 ## Compilation process
 
-*Source code* -> **Preprocessor** -> **Lexer** -> *Token stream* -> **Parser** -> *AST* -> **Sementic analysis** -> **Code generation** -> **Machine code
+*Source code* -> **Preprocessor** -> **Lexer** -> *Token stream* -> **Parser** -> *AST* -> **Semantic analysis** -> **Code generation** -> *Machine code*
 
 
 ### Preprocessor
@@ -33,6 +33,7 @@ enum Kind {
 }
 ```
 
+
 ### Parser
 EASB uses a simple descent recursive parser. 
 
@@ -44,7 +45,18 @@ It has two phases:
     - Outputs CST
 2. AST Building
     - Builds AST from CST
-    - Uses rules declared in [AST Structure.txt](Sources/EASMCompiler/Resources/AST Structure.txt)
+    - Uses rules declared in [AST Structure.txt](<Sources/EASMCompiler/Resources/AST Structure.txt>)
+
+
+### Semantic analysis
+Checks that:
+
+- No variable is declared twice within scope
+- Instruction arguments have the right type
+
+
+### Code generation
+Processes AST and generates executable machine code.
 
 
 

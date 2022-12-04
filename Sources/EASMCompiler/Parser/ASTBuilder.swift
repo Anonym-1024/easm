@@ -224,40 +224,39 @@ public class ASTBuilder {
             from.children.removeFirst()
         }
         
-        
-        guard let funcDeclarations = try? funcDeclarations(from.children[0]) else { throw ASTError.error }
-        array.append(contentsOf: funcDeclarations)
+        if !from.children.isEmpty {
+            guard let funcDeclarations = try? funcDeclarations(from.children[0]) else { throw ASTError.error }
+            array.append(contentsOf: funcDeclarations)
+        }
         
         return ANode(children: array, kind: .ashFile)
     }
     
-    func global(_ _from: CNode) -> ANode {
+    func global(_ _from: CNode) throws -> ANode {
         
         var from = _from
         var array = [ANode]()
         from.children.removeFirst()
         
-        try array.append(contentsOf: variables(from.children[0]))
+        try array.append(contentsOf: try variables(from.children[0]))
         return ANode(children: array, kind: .global)
     }
     
-    func variable(_ _from: CNode) -> ANode {
+    func variable(_ _from: CNode) throws -> ANode {
         var from = _from
         var array = [ANode]()
         var content = [String]()
-        
         content.append(from.children[0].content!.lexeme)
         
         content.append(from.children[1].content!.lexeme)
         
         content.append(from.children[2].content!.lexeme)
-        
         if from.children[4].content?.kind == .keyword {
             content.append("later")
+        } else if from.children[4].children.first?.kind == .identifier{
+            content.append(try identifier(from.children[4].children[0]))
         } else {
             switch from.children[4].content!.kind {
-            case .identifier:
-                array.append(varValue(from.children[4]))
             case .charLiteral:
                 array.append(charLiteral(from.children[4]))
             case .numberLiteral:
@@ -288,7 +287,7 @@ public class ASTBuilder {
         return ANode(children: [], kind: .intLiteral, content: [from.content!.lexeme])
     }
     
-    func variables(_ _from: CNode) -> [ANode] {
+    func variables(_ _from: CNode) throws -> [ANode] {
         let from = _from
         var array = [ANode]()
         for child in from.children {
@@ -301,7 +300,7 @@ public class ASTBuilder {
         return array
     }
     
-    func funcDeclaration(_ _from: CNode) -> ANode {
+    func funcDeclaration(_ _from: CNode) throws -> ANode {
         var from = _from
         var array = [ANode]()
         var content = [String]()
@@ -309,21 +308,26 @@ public class ASTBuilder {
         from.children.removeFirst()
         
         content.append(from.children[0].content!.lexeme)
-        
-        array.append(contentsOf: args(from.children[1]))
-        print(from.children.last)
-        if from.children[2].kind == .funcRet {
-            array.append(ret(from.children[2]))
+        if from.children[1].kind == .funcArgs {
+            array.append(contentsOf: args(from.children[1]))
+            
+            if from.children[2].kind == .funcRet {
+                array.append(ret(from.children[2]))
+            }
+        } else {
+            if from.children[1].kind == .funcRet {
+                array.append(ret(from.children[1]))
+            }
         }
         
         if from.children.last!.kind == .funcDeclBody {
-            array.append(contentsOf: variables(from.children.last!))
+            array.append(contentsOf: try variables(from.children.last!))
         }
         
         return ANode(children: array, kind: .funcDeclaration, content: content)
     }
     
-    func funcDeclarations(_ _from: CNode) -> [ANode] {
+    func funcDeclarations(_ _from: CNode) throws -> [ANode] {
         let from = _from
         var array = [ANode]()
         for child in from.children {

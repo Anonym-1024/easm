@@ -413,8 +413,11 @@ public class Parser {
     }
     
     func parseVarValue() throws -> Node {
-        if conforms(to: "later") || conforms(to: .identifier) {
+        if conforms(to: "later") {
             return Node(children: [], kind: .leaf, content: popToken())
+        
+        } else if let identifierNode = try? parseIdentifier(){
+            return Node(children: [identifierNode], kind: .varValue)
         } else {
             throw ParserError.invalidType
         }
@@ -446,16 +449,16 @@ public class Parser {
         
         guard conforms(to: "(") else { throw ParserError.expectedPunctuation("(") }
         let lParNode = Node(children: [], kind: .leaf, content: popToken())
-        
-        let funcArgsNode = try parseFuncArgs()
-        
+        var argsNode = [Node]()
+        if let funcArgsNode = try? parseFuncArgs() {
+            argsNode.append(funcArgsNode)
+        }
         guard conforms(to: ")") else { throw ParserError.expectedPunctuation(")") }
         let rParNode = Node(children: [], kind: .leaf, content: popToken())
         
         var optNodes = [Node]()
         
         if let funcRetNode = try? parseFuncRet() {
-            print("j")
             optNodes.append(funcRetNode)
         }
         
@@ -463,7 +466,7 @@ public class Parser {
             optNodes.append(funcDeclBody)
         }
         
-        return Node(children: [funcNode, identifierNode, lParNode, funcArgsNode, rParNode] + optNodes, kind: .funcDeclaration)
+        return Node(children: [funcNode, identifierNode, lParNode] + argsNode + [rParNode] + optNodes, kind: .funcDeclaration)
     }
     
     func parseFuncArgs() throws -> Node {

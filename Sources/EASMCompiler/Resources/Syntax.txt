@@ -20,7 +20,7 @@
 <var-declarations> ->> <var-declaration> <var-declarations>?
 <var-declaration> ->> var .identifier : <type> = <var-value> | const .identifier : <type> = <literal>
 <type> ->> int | char
-<var-value> ->> later | .identifier
+<var-value> ->> later | <identifier>
 <literal> ->> .charLiteral | .numberLiteral
 <func-declarations> ->> <func-declaration> <func-declarations>?
 <func-declaration> ->> func .identifier ( <func-args> ) <func-ret>? <func-decl-body>?
