@@ -11,5 +11,6 @@
 <file-ash> ->> <global>? [<func-declaration>]
 <global> ->> [<variable>]?
 <variable> ->> `const/var` `name` `type` `value`
-<func-declaration> ->> `name` [<arg>] <arg>? [<variable>]
+<func-declaration> ->> `name` [<arg>] <ret>? [<variable>]
 <arg> ->> `name` `type`
+<ret> ->> `name` `type`
