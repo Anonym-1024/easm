@@ -23,7 +23,7 @@
 <var-value> ->> later | <identifier>
 <literal> ->> .charLiteral | .numberLiteral
 <func-declarations> ->> <func-declaration> <func-declarations>?
-<func-declaration> ->> func .identifier ( <func-args> ) <func-ret>? <func-decl-body>?
+<func-declaration> ->> func .identifier ( <func-args>? ) <func-ret>? <func-decl-body>?
 <func-args> ->> <func-arg> | <func-arg> , <func-args>
 <func-arg> ->> .identifier : <type>
 <func-ret> ->> -> .identifier : <type>

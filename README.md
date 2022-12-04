@@ -60,3 +60,4 @@ Processes AST and generates executable machine code.
 
 
 
+## [Language guide](<Language guide.md>)
