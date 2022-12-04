@@ -44,7 +44,7 @@ It has two phases:
     - Checks context-free-grammar declared in [Syntax.txt](Sources/EASMCompiler/Resources/Syntax.txt)
     - Outputs CST
 2. AST Building
-    - Declared in [Parser.swift](Sources/EASMCompiler/Parser/ASTBuilder.swift)
+    - Declared in [ASTBuilder.swift](Sources/EASMCompiler/Parser/ASTBuilder.swift)
     - Builds AST from CST
     - Uses rules declared in [AST Structure.txt](<Sources/EASMCompiler/Resources/AST Structure.txt>)
 
