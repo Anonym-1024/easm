@@ -81,7 +81,7 @@ public class Parser {
     }
     
     func parseFileAsm() throws -> Node {
-        
+        let d = Date()
         var children = [Node]()
         
         if let mainNode = try? parseMain() {
@@ -90,7 +90,7 @@ public class Parser {
         if let funcImplementationsNode = try? parseFuncImplementations() {
             children.append(funcImplementationsNode)
         }
-        
+        print("Parser: ", d.distance(to: Date()))
         return Node(children: children, kind: .fileAsh)
     }
     
@@ -98,10 +98,8 @@ public class Parser {
         guard conforms(to: "main") else { throw ParserError.expectedKeyword("main")}
         let mainKeywordNode = Node(children: [], kind: .leaf, content: popToken())
         
-        
         guard conforms(to: "{") else { throw ParserError.expectedPunctuation("{")}
         let lBraceNode = Node(children: [], kind: .leaf, content: popToken())
-        
         
         let statementsNode = try parseStatements()
         guard conforms(to: "}") else { throw ParserError.expectedPunctuation("}")}
@@ -165,6 +163,8 @@ public class Parser {
             return Node(children: [addressNode], kind: .instrArg)
         } else if let pointerNode = try? parsePointer() {
             return Node(children: [pointerNode], kind: .instrArg)
+        } else if let valueNode = try? parseValue() {
+            return Node(children: [valueNode], kind: .instrArg)
         }  else {
             throw ParserError.expectedArgument
         }
@@ -224,6 +224,20 @@ public class Parser {
             } else {
                 throw ParserError.invalidPointer
             }
+        } else {
+            throw ParserError.invalidPointer
+        }
+    }
+    
+    func parseValue() throws -> Node {
+        
+        if conforms(to: " @") {
+            let atNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            let literalNode = try parseLiteral()
+            
+            return Node(children: [atNode, literalNode], kind: .value)
+            
         } else {
             throw ParserError.invalidPointer
         }

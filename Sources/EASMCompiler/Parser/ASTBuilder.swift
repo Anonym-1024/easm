@@ -37,6 +37,7 @@ public class ASTBuilder {
     // ASM File
     
     func fileAsm(_ _from: CNode) throws -> ANode {
+        let d = Date()
         var from = _from
         var array = [ANode]()
         if from.children.first?.kind == .main {
@@ -44,10 +45,11 @@ public class ASTBuilder {
             from.children.removeFirst()
         }
         
-        
-        guard let funcImplementations = try? funcImplementations(from.children[0]) else { throw ASTError.error }
-        array.append(contentsOf: funcImplementations)
-        
+        if !from.children.isEmpty {
+            guard let funcImplementations = try? funcImplementations(from.children[0]) else { throw ASTError.error }
+            array.append(contentsOf: funcImplementations)
+        }
+        print("AST Builder: ", d.distance(to: Date()))
         return ANode(children: array, kind: .asmFile)
     }
     
@@ -105,6 +107,8 @@ public class ASTBuilder {
                 array.append(try address(from.children.first!.children.first!.children.first!))
             } else if from.children.first!.children.first!.children.first!.kind == .pointer {
                 array.append(try pointer(from.children.first!.children.first!.children.first!))
+            } else if from.children.first!.children.first!.children.first!.kind == .value {
+                array.append(try value(from.children.first!.children.first!.children.first!))
             }
         }
             
@@ -160,6 +164,19 @@ public class ASTBuilder {
             }
         }
         return ANode(children: [], kind: .pointer, content: contents)
+    }
+    
+    func value(_ _from: CNode) throws -> ANode {
+        let from = _from
+        var contents = [String]()
+        for i in from.children {
+            if i.kind == .leaf {
+                contents.append(i.content!.lexeme)
+            } else {
+                throw ASTError.error
+            }
+        }
+        return ANode(children: [], kind: .value, content: contents)
     }
     
     func identifier(_ _from: CNode) throws -> String {

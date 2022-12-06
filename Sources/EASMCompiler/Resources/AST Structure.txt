@@ -1,10 +1,12 @@
 <file-asm> ->> <main>? [<func-implementation>]
 <main> ->> [<instruction> | <label> | <namespace>]
-<instruction> ->> `instruction` `argument`?
+<instruction> ->> `instruction` <argument>?
 <label> ->> `identifier` <address>
 <namespace> ->> `identifier`
+<argument> ->> <address> | <pointer> | <value>
 <address> ->> `operator` `content`?
 <pointer> ->>  `operator` `content`
+<value> ->> `operator` `content`
 <func-implementation> ->> `name` [<instruction> | <label> | <namespace>]
 
 

@@ -48,6 +48,7 @@ public struct CST {
             case instrArg
             case address
             case pointer
+            case value
             case identifier
             case lblDeclaration
             case namespace

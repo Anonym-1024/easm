@@ -35,6 +35,7 @@ public struct AST {
             case namespace
             case address
             case pointer
+            case value
             case funcImplementation
             
             

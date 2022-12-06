@@ -47,7 +47,7 @@ public class LexicalAnalyser{
                 tokens.append(handleWord())
                 
             //Operator
-            case "=", "#", "$", "&":
+            case "=", "#", "$", "&", "@":
                 tokens.append(try handleOperator())
                 
             //Punctuation
@@ -148,6 +148,11 @@ public class LexicalAnalyser{
             let token = Token(kind: .operator, lexeme: String(chars[(pos - 1)...pos]))
             pos += 1
             return token
+        } else if chars[pos - 1] == " " && chars[pos] == "@" && [#"""#, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "`"].contains(chars[pos + 1]) {
+            let token = Token(kind: .operator, lexeme: String(" @"))
+            pos += 1
+            return token
+            
         } else {
             throw LexerError.invalidOperator
         }
