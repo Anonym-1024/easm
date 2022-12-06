@@ -2,7 +2,7 @@
 
 ## Compilation process
 
-*Source code* -> **Preprocessor** -> **Lexer** -> *Token stream* -> **Parser** -> *AST* -> **Semantic analysis** -> **Code generation** -> *Machine code*
+*Source code* -> **Preprocessor** -> **Lexer** -> Token stream -> **Parser** -> AST -> **Semantic analysis** -> **Code generation** -> *Machine code*
 
 
 ### Preprocessor

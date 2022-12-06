@@ -31,6 +31,12 @@ let package = Package(
         .executableTarget(
             name: "EASMDriver",
             dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser"), .target(name: "EASMCompiler")]),
+        
+        .target(
+            name: "BuiltinLibraries",
+            dependencies: [],
+            exclude: [],
+            resources: []),
         .testTarget(
             name: "EASMTests",
             dependencies: ["EASMCompiler"]),
