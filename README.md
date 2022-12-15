@@ -1,6 +1,6 @@
 # EASM
 
-## Compilation process
+## Compiler
 
 *Source code* -> **Preprocessor** -> **Lexer** -> Token stream -> **Parser** -> AST -> **Semantic analysis** -> **Code generation** -> *Machine code*
 

@@ -1,0 +1,30 @@
+nop: -
+loada: <address> | <value>
+storea: <address>
+loadb: <address> | <value>
+storeb: <address>
+addab: <address>
+subab: <address>
+subba: <address>
+jmp: <address>
+jmpn: <address>
+jmpg: <address>
+jmps: <address>
+jmpe: <address>
+jmpo: <address>
+jmpt: <address>
+jmpi: <address>
+tmrs: <address> | <value>
+storetmr: <address>
+outrn: <address> | <value>
+outrt: <address> | <value>
+in: -
+storeia: -
+storeib: -
+storeir: <address>
+push: <address> | <value>
+pop: <address> | <value>
+stki: <address>
+call: <address>
+ret: -
+halt: -
