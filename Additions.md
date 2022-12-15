@@ -1,11 +1,11 @@
 # Additions
 
 
-- [] Immediate values
-- [] Function calls
-- [] Syscalls
-- [] Type-erased variables
-- [] Pointers
+- [ ] Immediate values
+- [ ] Function calls
+- [ ] Syscalls
+- [ ] Type-erased variables
+- [ ] Pointers
 
 
 ## Immediate values
