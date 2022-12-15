@@ -1,6 +1,15 @@
 # Additions
 
-## Immediate values [ ]
+
+- [] Immediate values
+- [] Function calls
+- [] Syscalls
+- [] Type-erased variables
+- [] Pointers
+
+
+## Immediate values
+
 ```
  lda @34
  
@@ -25,7 +34,7 @@ syscall alloc($num)
 syscall alloc(@2)
 ```
 
-## Unmanaged variable [ ]
+## Type-erased variables [ ]
 variable with no type.
 
 ```
