@@ -2,13 +2,16 @@
 <file-asm> ->> <main> <func-implementations>?
 <main> ->> main { <statements>? }
 <statements> ->> <statement> <stmt-terminator> <statements>?
-<statement> ->> <instruction-stmt> | <lbl-declaration> | <namespace>
+<statement> ->> <instruction-stmt> | <lbl-declaration> | <namespace> | <call> | <syscall>
 <stmt-terminator> ->> ; | \n | }
 <instruction-stmt> ->> .instruction <instr-arg>?
-<instr-arg> ->> <address> | <pointer> | <value>
-<address> ->>  # .numberLiteral |  $ <identifier> | $$ | $ null
-<pointer> ->>  & .numberLiteral |  & <identifier> | & null
-<value> ->> @ <literal>
+<instr-arg> ->> <address> | <value>
+<address> ->>  # .numberLiteral |  $ <identifier> | $$
+<value> ->> @ .numberLiteral | @ .charLiteral
+<call> ->> call <identifier> ( <func-call-args>? )
+<syscall> ->> syscall .identifier ( <func-call-arg>? )
+<func-call-args> -> <func-call-arg> <func-call-args>?
+<func-call-arg> -> .identifier: <instr-arg>
 <identifier> ->> .identifier | .identifier . <identifier>
 <lbl-declaration> ->> lbl .identifier = <address>
 <namespace> ->> --- .identifier ---
@@ -19,10 +22,11 @@
 <file-ash> ->> <global-decl>? <func-declarations>?
 <global-decl> ->> global { <var-declarations>? }
 <var-declarations> ->> <var-declaration> <var-declarations>?
-<var-declaration> ->> var .identifier : <type> = <var-value> | const .identifier : <type> = <literal>
-<type> ->> int | char
-<var-value> ->> later | <identifier>
-<literal> ->> .charLiteral | .numberLiteral
+<var-declaration> ->> var .identifier : <type> = <var-value> | const .identifier : <type> = <const-value>
+<type> ->> <ptr-stars>? int | <ptr-stars>? char | any
+<pointer> ->>  & .numberLiteral |  & <identifier> | & null
+<var-value> ->> later | <identifier> | <value> | <pointer>
+<const-value> ->> .charLiteral | .numberLiteral | <pointer>
 <func-declarations> ->> <func-declaration> <func-declarations>?
 <func-declaration> ->> func .identifier ( <func-args>? ) <func-ret>? <func-decl-body>?
 <func-args> ->> <func-arg> | <func-arg> , <func-args>

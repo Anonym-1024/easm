@@ -47,8 +47,9 @@ public struct CST {
             case instructionStmt
             case instrArg
             case address
-            case pointer
             case value
+            case funcCallArg
+            case funcCallArgs
             case identifier
             case lblDeclaration
             case namespace
@@ -60,8 +61,9 @@ public struct CST {
             case varDeclarations
             case varDeclaration
             case type
+            case pointer
             case varValue
-            case literal
+            case constValue
             case funcDeclarations
             case funcDeclaration
             case funcArgs

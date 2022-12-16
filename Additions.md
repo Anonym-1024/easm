@@ -1,10 +1,10 @@
 # Additions
 
 
-- [ ] Immediate values
+- [x] Immediate values
 - [ ] Function calls
 - [ ] Syscalls
-- [ ] Type-erased variables
+- [x] Type-erased variables
 - [ ] Pointers
 
 
@@ -16,7 +16,7 @@
  outc @"k"
  ```
  
- ## Function calls [ ]
+ ## Function calls
  
  ```
  call foo(i: $v)
@@ -27,14 +27,14 @@
  call $foo
  ```
 
-## Syscalls [ ]
+## Syscalls
 
 ```
 syscall alloc($num)
 syscall alloc(@2)
 ```
 
-## Type-erased variables [ ]
+## Type-erased variables
 variable with no type.
 
 ```
@@ -47,9 +47,9 @@ var g = later
 
 Constants always have a type specified.
 
-## Pointers [ ]
+## Pointers
 
-### Pointer type [ ]
+### Pointer type
 
 ```
 const j: int = 89
@@ -64,7 +64,7 @@ func bar(a: char, b: *int) -> c: *char {
 }
 ```
 
-### Usage in code [ ]
+### Usage in code
 
 ```
 mkptr $j // make pointer to the address of variable `j`
@@ -73,5 +73,12 @@ stptr $ptrj // stores the created pointer to variable `ptrj`. It now contains a 
 
 ldptr $ptrj // loads the pointer stored in `ptrj` to the pointer register.
 
-storea ptr // stores content of A-register to ram at the address the pointer is pointing to.
+ptr     //
+storea  // stores content of A-register to ram at the address the pointer is pointing to.
+```
+
+### Null pointer
+
+```
+var nullable: *int = &null // points to zero - invalid -> has effectively no value
 ```

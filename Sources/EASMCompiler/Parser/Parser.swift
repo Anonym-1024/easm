@@ -129,6 +129,10 @@ public class Parser {
             return Node(children: [lblDeclarationNode], kind: .statement)
         } else if let namespaceNode = try? parseNamespace() {
             return Node(children: [namespaceNode], kind: .statement)
+        } else if let callNode = try? parseCall() {
+            return Node(children: [callNode], kind: .statement)
+        } else if let syscallNode = try? parseSyscall() {
+            return Node(children: [syscallNode], kind: .statement)
         } else {
             throw ParserError.invalidStatement
         }
@@ -161,11 +165,9 @@ public class Parser {
     func parseInstrArg() throws -> Node {
         if let addressNode = try? parseAddress() {
             return Node(children: [addressNode], kind: .instrArg)
-        } else if let pointerNode = try? parsePointer() {
-            return Node(children: [pointerNode], kind: .instrArg)
         } else if let valueNode = try? parseValue() {
             return Node(children: [valueNode], kind: .instrArg)
-        }  else {
+        } else {
             throw ParserError.expectedArgument
         }
     }
@@ -186,11 +188,6 @@ public class Parser {
             
             if let identifierNode = try? parseIdentifier() {
                 return Node(children: [dollarSignNode, identifierNode], kind: .address)
-            } else if conforms(to: "null") {
-                let nullNode = Node(children: [], kind: .leaf, content: popToken())
-                
-                
-                return Node(children: [dollarSignNode, nullNode], kind: .address)
             } else {
                 throw ParserError.invalidAddress
             }
@@ -203,44 +200,107 @@ public class Parser {
         }
     }
     
-    func parsePointer() throws -> Node {
-        
-        if conforms(to: " &") {
-            let ampersandNode = Node(children: [], kind: .leaf, content: popToken())
-            
-            
-            if conforms(to: .numberLiteral) {
-                let numberLiteralNode = Node(children: [], kind: .leaf, content: popToken())
-                
-                
-                return Node(children: [ampersandNode, numberLiteralNode], kind: .pointer)
-            } else if let identifierNode = try? parseIdentifier() {
-                return Node(children: [ampersandNode, identifierNode], kind: .pointer)
-            } else if conforms(to: "null") {
-                let nullNode = Node(children: [], kind: .leaf, content: popToken())
-                
-                
-                return Node(children: [ampersandNode, nullNode], kind: .pointer)
-            } else {
-                throw ParserError.invalidPointer
-            }
-        } else {
-            throw ParserError.invalidPointer
-        }
-    }
     
     func parseValue() throws -> Node {
         
         if conforms(to: " @") {
             let atNode = Node(children: [], kind: .leaf, content: popToken())
             
-            let literalNode = try parseLiteral()
+            if conforms(to: .numberLiteral) {
+                let numberLiteralNode = Node(children: [], kind: .leaf, content: popToken())
+                return Node(children: [atNode, numberLiteralNode], kind: .value)
+            } else if conforms(to: .charLiteral){
+                let charLiteralNode = Node(children: [], kind: .leaf, content: popToken())
+                return Node(children: [atNode, charLiteralNode], kind: .value)
+            } else {
+                throw ParserError.invalidValue
+            }
             
-            return Node(children: [atNode, literalNode], kind: .value)
+            
             
         } else {
-            throw ParserError.invalidPointer
+            throw ParserError.invalidValue
         }
+    }
+    
+    func parseCall() throws -> Node {
+        guard conforms(to: "call") else { throw ParserError.invalidCall}
+        let callNode = Node(children: [], kind: .leaf, content: popToken())
+        
+    
+        let identifierNode = try parseIdentifier()
+        
+        
+        guard conforms(to: "(") else { throw ParserError.invalidCall}
+        let lBraceNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        
+        if let funcCallArgsNode = try? parseFuncCallArgs() {
+            guard conforms(to: ")") else { throw ParserError.invalidCall}
+            let rBraceNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            
+            return Node(children: [callNode, identifierNode, lBraceNode, funcCallArgsNode, rBraceNode], kind: .funcImplementation)
+        } else {
+            guard conforms(to: ")") else { throw ParserError.invalidCall}
+            let rBraceNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            
+            return Node(children: [callNode, identifierNode, lBraceNode, rBraceNode], kind: .funcImplementation)
+        }
+    }
+    
+    func parseSyscall() throws -> Node {
+        guard conforms(to: "syscall") else { throw ParserError.invalidCall}
+        let syscallNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        guard conforms(to: .identifier) else { throw ParserError.invalidCall}
+        let identifierNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        
+        guard conforms(to: "(") else { throw ParserError.invalidCall}
+        let lBraceNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        
+        if let funcCallArgNode = try? parseFuncCallArg() {
+            guard conforms(to: ")") else { throw ParserError.invalidCall}
+            let rBraceNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            
+            return Node(children: [syscallNode, identifierNode, lBraceNode, funcCallArgNode, rBraceNode], kind: .funcImplementation)
+        } else {
+            guard conforms(to: ")") else { throw ParserError.invalidCall}
+            let rBraceNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            
+            return Node(children: [syscallNode, identifierNode, lBraceNode, rBraceNode], kind: .funcImplementation)
+        }
+    }
+    
+    func parseFuncCallArgs() throws -> Node {
+        let funcCallArgNode = try parseFuncCallArg()
+        
+        if conforms(to: ",") {
+            let commaNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            let funcCallArgsNode = try parseFuncCallArgs()
+            
+            return Node(children: [funcCallArgNode, commaNode, funcCallArgsNode], kind: .funcCallArgs)
+        } else {
+            return Node(children: [funcCallArgNode], kind: .funcArgs)
+        }
+    }
+    
+    func parseFuncCallArg() throws -> Node {
+        guard conforms(to: .identifier) else { throw ParserError.expectedIdentifier}
+        let identifierNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        guard conforms(to: ":") else { throw ParserError.expectedPunctuation(":")}
+        let colonNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        let instrArgNode = try parseInstrArg()
+        
+        return Node(children: [identifierNode, colonNode, instrArgNode], kind: .funcCallArg)
     }
     
     func parseIdentifier() throws -> Node {
@@ -383,18 +443,19 @@ public class Parser {
             
             guard conforms(to: .identifier) else { throw ParserError.expectedIdentifier }
             let identifierNode = Node(children: [], kind: .leaf, content: popToken())
-            
-            guard conforms(to: ":") else { throw ParserError.expectedTypeDeclaration }
-            let colonNode = Node(children: [], kind: .leaf, content: popToken())
-            
-            let typeNode = try parseType()
-            
+            var optNodes = [Node]()
+            if  conforms(to: ":") {
+                let colonNode = Node(children: [], kind: .leaf, content: popToken())
+                
+                let typeNode = try parseType()
+                optNodes = [colonNode, typeNode]
+            }
             guard conforms(to: " = ") else { throw ParserError.expectedPunctuation("=") }
             let equalSignNode = Node(children: [], kind: .leaf, content: popToken())
             
             let varValueNode = try parseVarValue()
             
-            return Node(children: [varNode, identifierNode, colonNode, typeNode, equalSignNode, varValueNode], kind: .varDeclaration)
+            return Node(children: [varNode, identifierNode] + optNodes + [equalSignNode, varValueNode], kind: .varDeclaration)
             
         } else if conforms(to: "const") {
             let constNode = Node(children: [], kind: .leaf, content: popToken())
@@ -410,36 +471,81 @@ public class Parser {
             guard conforms(to: " = ") else { throw ParserError.expectedPunctuation("=") }
             let equalSignNode = Node(children: [], kind: .leaf, content: popToken())
             
-            let literalNode = try parseLiteral()
+            let constValueNode = try parseConstValue()
             
-            return Node(children: [constNode, identifierNode, colonNode, typeNode, equalSignNode, literalNode], kind: .varDeclaration)
+            return Node(children: [constNode, identifierNode, colonNode, typeNode, equalSignNode, constValueNode], kind: .varDeclaration)
         } else {
             throw ParserError.expectedKeyword("var/const")
         }
     }
     
     func parseType() throws -> Node {
-        if conforms(to: "int") || conforms(to: "char") {
+        if conforms(to: "int") || conforms(to: "char") || conforms(to: "any") {
             return Node(children: [], kind: .leaf, content: popToken())
+        } else if conforms(to: "*"){
+            var asterisks = [Character]()
+            while currentToken().lexeme == "*" {
+                asterisks.append(Character(popToken().lexeme))
+            }
+            if conforms(to: "int") || conforms(to: "char") {
+                let popped = popToken()
+                return Node(children: [], kind: .leaf, content: Token(kind: popped.kind, lexeme: String(asterisks) + popped.lexeme))
+            } else {
+                throw ParserError.invalidType
+            }
         } else {
             throw ParserError.invalidType
+        }
+    }
+    
+    func parsePointer() throws -> Node {
+        
+        if conforms(to: " &") {
+            let ampersandNode = Node(children: [], kind: .leaf, content: popToken())
+            
+            
+            if conforms(to: .numberLiteral) {
+                let numberLiteralNode = Node(children: [], kind: .leaf, content: popToken())
+                
+                
+                return Node(children: [ampersandNode, numberLiteralNode], kind: .pointer)
+            } else if let identifierNode = try? parseIdentifier() {
+                return Node(children: [ampersandNode, identifierNode], kind: .pointer)
+            } else if conforms(to: "null") {
+                let nullNode = Node(children: [], kind: .leaf, content: popToken())
+                
+                
+                return Node(children: [ampersandNode, nullNode], kind: .pointer)
+            } else {
+                throw ParserError.invalidPointer
+            }
+        } else {
+            throw ParserError.invalidPointer
         }
     }
     
     func parseVarValue() throws -> Node {
         if conforms(to: "later") {
-            return Node(children: [], kind: .leaf, content: popToken())
+            let laterNode = Node(children: [], kind: .leaf, content: popToken())
+            return Node(children: [laterNode], kind: .varValue)
         
         } else if let identifierNode = try? parseIdentifier(){
             return Node(children: [identifierNode], kind: .varValue)
+        } else if let valueNode = try? parseValue(){
+            return Node(children: [valueNode], kind: .varValue)
+        } else if let pointerNode = try? parsePointer(){
+            return Node(children: [pointerNode], kind: .varValue)
         } else {
             throw ParserError.invalidType
         }
     }
     
-    func parseLiteral() throws -> Node {
+    func parseConstValue() throws -> Node {
         if conforms(to: .charLiteral) || conforms(to: .numberLiteral) {
-            return Node(children: [], kind: .leaf, content: popToken())
+            let literalNode = Node(children: [], kind: .leaf, content: popToken())
+            return Node(children: [literalNode], kind: .constValue)
+        } else if let pointerNode = try? parsePointer(){
+            return Node(children: [pointerNode], kind: .constValue)
         } else {
             throw ParserError.invalidType
         }
@@ -551,6 +657,8 @@ public class Parser {
         case invalidFunctionImplementation
         case expectedTypeDeclaration
         case invalidType
+        case invalidValue
+        case invalidCall
     }
     
 }
