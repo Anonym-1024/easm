@@ -53,6 +53,8 @@ public struct CST {
             case identifier
             case lblDeclaration
             case namespace
+            case call
+            case syscall
             case funcImplementations
             case funcImplementation
             

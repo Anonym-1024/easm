@@ -1,9 +1,12 @@
 <file-asm> ->> <main>? [<func-implementation>]
-<main> ->> [<instruction> | <label> | <namespace>]
+<main> ->> [<instruction> | <label> | <namespace> | <call> | <syscall>]
 <instruction> ->> `instruction` <argument>?
 <label> ->> `identifier` <address>
 <namespace> ->> `identifier`
-<argument> ->> <address> | <pointer> | <value>
+<call> ->> `identifier` [<call-arg>]
+<syscall> ->> `identifier` <call-arg>?
+<call-arg> ->> `identifier` <argument>
+<argument> ->> <address> | <value>
 <address> ->> `operator` `content`?
 <pointer> ->>  `operator` `content`
 <value> ->> `operator` `content`

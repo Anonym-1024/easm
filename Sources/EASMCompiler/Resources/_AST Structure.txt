@@ -1,0 +1,34 @@
+
+<file-asm> ->> <main>?fro <func-implementations>?
+<main> ->> <statements>
+<statements> ->> [<statement>]
+<statement> ->> <instruction-stmt> | <lbl-declaration> | <namespace> | <call> | <syscall>
+<instruction-stmt> ->> .instruction <instr-arg>?
+<instr-arg> ->> <address> | <value>
+<address> ->>  # .numberLiteral |  $ <identifier> | $$
+<value> ->> @ .numberLiteral | @ .charLiteral
+<call> ->> <identifier> <func-call-args>
+<syscall> ->> .identifier <func-call-arg>?
+<func-call-args> ->> [<func-call-arg>]
+<func-call-arg> ->> .identifier <instr-arg>
+<identifier> ->> [.identifier]
+<lbl-declaration> ->> .identifier <address>
+<namespace> ->> .identifier
+<func-implementations> ->> [<func-implementation>]
+<func-implementation> ->> .identifier <statements>
+
+
+<file-ash> ->> <global-decl>? <func-declarations>?
+<global-decl> ->> <var-declarations>
+<var-declarations> ->> [<var-declaration>]
+<var-declaration> ->> var .identifier <type> <var-value> | const .identifier <type> <const-value>
+<type> ->> <ptr-stars>?int | <ptr-stars>?char | any
+<pointer> ->>  & .numberLiteral |  & <identifier> | & null
+<var-value> ->> later | <identifier> | <value> | <pointer>
+<const-value> ->> .charLiteral | .numberLiteral | <pointer>
+<func-declarations> ->> [<func-declaration>]
+<func-declaration> ->> .identifier <func-args>? <func-ret>? <var-declarations>?
+<func-args> ->> [<func-arg>]
+<func-arg> ->> .identifier : <type>
+<func-ret> ->> -> .identifier : <type>
+

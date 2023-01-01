@@ -26,8 +26,8 @@ let package = Package(
         .target(
             name: "EASMCompiler",
             dependencies: [],
-            exclude: ["Resources/ExampleCode-outdated.rtf", "Resources/CodeExample.txt", "Resources/SyntaxHighlightingExample.pdf"],
-            resources: [.process("Resources/Keywords.txt"), .process("Resources/Instructions.txt"), .process("Resources/Colors.xcassets"), .process("Resources/Syntax.txt"), .process("Resources/AST Structure.txt")]),
+            exclude: ["Resources/CodeExample.txt", "Resources/SyntaxHighlightingExample.pdf"],
+            resources: [.process("Resources/Keywords.txt"), .process("Resources/Instructions.txt"), .process("Resources/InstructionsArgTypes.txt"), .process("Resources/Colors.xcassets"), .process("Resources/Syntax.txt"), .process("Resources/AST Structure.txt")]),
         .executableTarget(
             name: "EASMDriver",
             dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser"), .target(name: "EASMCompiler")]),
@@ -36,7 +36,14 @@ let package = Package(
             name: "BuiltinLibraries",
             dependencies: [],
             exclude: [],
-            resources: []),
+            resources: [
+                .process("Math/Math.asd"),
+                .process("Math/Math.asm"),
+                .process("Math/Math.ash"),
+                .process("Standard/Standard.asd"),
+                .process("Standard/Standard.asm"),
+                .process("Standard/Standard.ash")
+            ]),
         .testTarget(
             name: "EASMTests",
             dependencies: ["EASMCompiler"]),

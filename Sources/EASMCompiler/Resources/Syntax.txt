@@ -1,5 +1,5 @@
 
-<file-asm> ->> <main> <func-implementations>?
+<file-asm> ->> <main>? <func-implementations>?
 <main> ->> main { <statements>? }
 <statements> ->> <statement> <stmt-terminator> <statements>?
 <statement> ->> <instruction-stmt> | <lbl-declaration> | <namespace> | <call> | <syscall>
@@ -28,8 +28,7 @@
 <var-value> ->> later | <identifier> | <value> | <pointer>
 <const-value> ->> .charLiteral | .numberLiteral | <pointer>
 <func-declarations> ->> <func-declaration> <func-declarations>?
-<func-declaration> ->> func .identifier ( <func-args>? ) <func-ret>? <func-decl-body>?
+<func-declaration> ->> func .identifier ( <func-args>? ) <func-ret>? { <var-declarations>? }
 <func-args> ->> <func-arg> | <func-arg> , <func-args>
 <func-arg> ->> .identifier : <type>
 <func-ret> ->> -> .identifier : <type>
-<func-decl-body> ->> { <var-declarations> }

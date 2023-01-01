@@ -443,19 +443,19 @@ public class Parser {
             
             guard conforms(to: .identifier) else { throw ParserError.expectedIdentifier }
             let identifierNode = Node(children: [], kind: .leaf, content: popToken())
-            var optNodes = [Node]()
-            if  conforms(to: ":") {
-                let colonNode = Node(children: [], kind: .leaf, content: popToken())
+            
+        
+            guard conforms(to: ":") else { throw ParserError.invalidType }
+            let colonNode = Node(children: [], kind: .leaf, content: popToken())
                 
-                let typeNode = try parseType()
-                optNodes = [colonNode, typeNode]
-            }
+            let typeNode = try parseType()
+            
             guard conforms(to: " = ") else { throw ParserError.expectedPunctuation("=") }
             let equalSignNode = Node(children: [], kind: .leaf, content: popToken())
             
             let varValueNode = try parseVarValue()
             
-            return Node(children: [varNode, identifierNode] + optNodes + [equalSignNode, varValueNode], kind: .varDeclaration)
+            return Node(children: [varNode, identifierNode, colonNode, typeNode, equalSignNode, varValueNode], kind: .varDeclaration)
             
         } else if conforms(to: "const") {
             let constNode = Node(children: [], kind: .leaf, content: popToken())
@@ -586,7 +586,20 @@ public class Parser {
             optNodes.append(funcDeclBody)
         }
         
-        return Node(children: [funcNode, identifierNode, lParNode] + argsNode + [rParNode] + optNodes, kind: .funcDeclaration)
+        guard conforms(to: "{") else { throw ParserError.expectedPunctuation("{")}
+        let lBracketNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        optNodes.append(lBracketNode)
+        
+        if let varDeclarationsNode = try? parseVarDeclarations() {
+            optNodes.append(varDeclarationsNode)
+        }
+        
+        guard conforms(to: "}") else { throw ParserError.expectedPunctuation("}")}
+        let rBracketNode = Node(children: [], kind: .leaf, content: popToken())
+        
+        
+        return Node(children: [funcNode, identifierNode, lParNode] + argsNode + [rParNode] + optNodes + [rBracketNode], kind: .funcDeclaration)
     }
     
     func parseFuncArgs() throws -> Node {
